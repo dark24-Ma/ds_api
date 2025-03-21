@@ -9,12 +9,6 @@ dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
-  // connnexion à la bd
-  MongooseModule.forRoot(process.env.MONGODB_URL);
-  const userRepository = new UserRepository();
-  const createUserUseCase = new CreateUserUseCase(userRepository);
-
   await app.listen(3000);
 }
 bootstrap();
