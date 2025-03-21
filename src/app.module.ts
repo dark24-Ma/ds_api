@@ -9,6 +9,7 @@ import * as dotenv from 'dotenv';
 import { CreateUserUseCase } from './application/use-cases/create-user.use-case';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './application/controllers/auth.controller';
+import { AuthService } from './application/services/auth.service';
 dotenv.config();
 
 @Module({
@@ -21,6 +22,6 @@ dotenv.config();
     }),
   ],
   controllers: [UserController, AuthController],
-  providers: [UserRepository, CreateUserUseCase],
+  providers: [UserRepository, CreateUserUseCase, AuthService],
 })
 export class AppModule {}
