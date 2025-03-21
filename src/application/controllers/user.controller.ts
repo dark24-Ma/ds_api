@@ -12,12 +12,19 @@ export class UserController {
 
   @Post()
   async create(
-    @Body() userData: { name: string; email: string; password: string },
+    @Body()
+    userData: {
+      name: string;
+      email: string;
+      password: string;
+      firstname: string;
+    },
   ): Promise<User> {
     return this.createUserUseCase.execute(
       userData.name,
       userData.email,
       userData.password,
+      userData.firstname,
     );
   }
 

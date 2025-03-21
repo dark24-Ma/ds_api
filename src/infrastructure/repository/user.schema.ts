@@ -11,6 +11,9 @@ export class UserSchema extends User {
   email: string;
 
   @Prop({ required: true })
+  firstname: string;
+
+  @Prop({ required: true })
   password: string;
 }
 
