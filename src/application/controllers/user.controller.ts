@@ -1,7 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { CreateUserUseCase } from '../use-cases/create-user.use-case';
 import { UserRepository } from 'src/infrastructure/repository/user.repository';
 import { User } from 'src/domain/entities/user.entity';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -28,6 +37,7 @@ export class UserController {
     );
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   async findAll(): Promise<User[]> {
     return this.userRepository.findAll();
