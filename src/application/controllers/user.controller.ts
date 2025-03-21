@@ -43,6 +43,7 @@ export class UserController {
     return this.userRepository.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<void> {
     return this.userRepository.delete(id);
