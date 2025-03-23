@@ -12,6 +12,7 @@ import { AuthController } from './application/controllers/auth.controller';
 import { AuthService } from './application/services/auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './application/strategies/jwt.strategy';
+import { EmailService } from './application/services/email.service';
 dotenv.config();
 
 @Module({
@@ -20,11 +21,17 @@ dotenv.config();
     MongooseModule.forFeature([{ name: 'User', schema: userModel }]),
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'defaultSecret',
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '3600s' },
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [UserController, AuthController],
-  providers: [UserRepository, CreateUserUseCase, AuthService, JwtStrategy],
+  providers: [
+    UserRepository,
+    CreateUserUseCase,
+    AuthService,
+    JwtStrategy,
+    EmailService,
+  ],
 })
 export class AppModule {}

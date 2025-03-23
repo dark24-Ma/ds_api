@@ -3,12 +3,14 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/domain/entities/user.entity';
 import { UserRepository } from 'src/infrastructure/repository/user.repository';
 import * as bcrypt from 'bcrypt';
+import { EmailService } from './email.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userRepository: UserRepository,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   async register(
@@ -26,7 +28,10 @@ export class AuthService {
       firstname,
     );
     user.password = hashedPassword;
-    return this.userRepository.save(user);
+    const newUser = await this.userRepository.save(user);
+
+    await this.emailService.sendWelcomeEmail(email, name);
+    return newUser;
   }
 
   async validateUser(email: string, password: string): Promise<User | null> {
