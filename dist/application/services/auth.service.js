@@ -60,7 +60,7 @@ let AuthService = class AuthService {
             resetToken: resetToken,
             resetTokenExpiration: new Date(),
         });
-        const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
+        const resetLink = `http://185.97.146.99:5173/reset-password?token=${resetToken}`;
         await this.emailService.sendPasswordResetEmail(email, resetLink);
     }
     async resetPassowrd(token, newPassword) {
