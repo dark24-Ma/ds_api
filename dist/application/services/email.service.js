@@ -35,7 +35,7 @@ let EmailService = class EmailService {
     }
     async sendPasswordResetEmail(to, resetLink) {
         const mailOptions = {
-            from: '"Your App Name" <your-email@example.com>',
+            from: '"DS EDUCATION" <your-email@example.com>',
             to,
             subject: 'Réinitialisation de votre mot de passe',
             text: `Cliquez sur le lien suivant pour réinitialiser votre mot de passe : ${resetLink}`,

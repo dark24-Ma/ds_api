@@ -15,7 +15,10 @@ export declare class AuthController {
         access_token: string;
     }>;
     resetPassword(body: {
-        token: string;
-        newPassword: string;
+        resetToken: string;
+        password: string;
+    }): Promise<void>;
+    requestResetPawwaord(body: {
+        email: string;
     }): Promise<void>;
 }

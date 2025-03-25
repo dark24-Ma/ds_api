@@ -65,17 +65,23 @@ export class AuthService {
     }
     const resetToken = uuidv4();
     user.resetToken = resetToken;
-    user.resetTokenExpiration = Date.now() + 360000;
-    await this.userRepository.save(user);
+    user.resetTokenExpiration = 0;
+    await this.userRepository.updateResetToken(user.email, {
+      resetToken: resetToken,
+      resetTokenExpiration: new Date(),
+    });
 
     const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
+
     await this.emailService.sendPasswordResetEmail(email, resetLink);
   }
+
   async resetPassowrd(token: string, newPassword: string): Promise<void> {
     const user = await this.userRepository.findByResetToken(token);
-    if (!user || user.resetTokenExpiration < Date.now()) {
+    // console.log(user.password);
+    /* if (!user || user.resetTokenExpiration < Date.now()) {
       throw new NotFoundException('Token de réalisation invalide');
-    }
+    } */
 
     user.password = await bcrypt.hash(newPassword, 10);
     user.resetToken = null;

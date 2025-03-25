@@ -15,6 +15,9 @@ export class UserSchema extends User {
 
   @Prop({ required: true })
   password: string;
+
+  @Prop({ required: false })
+  resetToken: string;
 }
 
 export const userModel = SchemaFactory.createForClass(UserSchema);

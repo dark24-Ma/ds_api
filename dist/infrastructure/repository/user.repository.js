@@ -37,6 +37,18 @@ let UserRepository = class UserRepository {
     async findByResetToken(token) {
         return this.userModel.findOne({ resetToken: token }).exec();
     }
+    async updateResetToken(userEmail, resetData) {
+        return this.userModel
+            .findOneAndUpdate({ email: userEmail }, {
+            resetToken: resetData.resetToken,
+        }, { new: true })
+            .exec();
+    }
+    async updatePassword(userToken, newPassword) {
+        return this.userModel
+            .findOneAndUpdate({ resetToken: userToken }, { password: newPassword })
+            .exec();
+    }
 };
 exports.UserRepository = UserRepository;
 exports.UserRepository = UserRepository = __decorate([

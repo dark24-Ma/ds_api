@@ -30,4 +30,26 @@ export class UserRepository {
   async findByResetToken(token: string): Promise<User | null> {
     return this.userModel.findOne({ resetToken: token }).exec();
   }
+
+  async updateResetToken(
+    userEmail: string,
+    resetData: { resetToken: string; resetTokenExpiration: Date },
+  ) {
+    return this.userModel
+      .findOneAndUpdate(
+        { email: userEmail },
+        {
+          resetToken: resetData.resetToken,
+          // resetTokenExpiration: resetData.resetTokenExpiration,
+        },
+        { new: true }, // Cette option retourne le document mis à jour
+      )
+      .exec();
+  }
+
+  async updatePassword(userToken: string, newPassword: string) {
+    return this.userModel
+      .findOneAndUpdate({ resetToken: userToken }, { password: newPassword })
+      .exec();
+  }
 }

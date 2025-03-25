@@ -30,7 +30,13 @@ let AuthController = class AuthController {
         return this.authService.login(user);
     }
     async resetPassword(body) {
-        return this.authService.resetPassowrd(body.token, body.newPassword);
+        if (!body.resetToken || !body.password) {
+            throw new common_1.BadRequestException('Token et nouveau mot de passe requis');
+        }
+        return this.authService.resetPassowrd(body.resetToken, body.password);
+    }
+    async requestResetPawwaord(body) {
+        return this.authService.requestResetPassword(body.email);
     }
 };
 exports.AuthController = AuthController;
@@ -49,12 +55,19 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 __decorate([
-    (0, common_1.Post)('reset-password'),
+    (0, common_1.Put)('reset-password'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "resetPassword", null);
+__decorate([
+    (0, common_1.Post)('request-reset-password'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "requestResetPawwaord", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

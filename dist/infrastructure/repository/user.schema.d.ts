@@ -5,6 +5,7 @@ export declare class UserSchema extends User {
     email: string;
     firstname: string;
     password: string;
+    resetToken: string;
 }
 export declare const userModel: import("mongoose").Schema<UserSchema, import("mongoose").Model<UserSchema, any, any, any, import("mongoose").Document<unknown, any, UserSchema> & UserSchema & {
     _id: import("mongoose").Types.ObjectId;
