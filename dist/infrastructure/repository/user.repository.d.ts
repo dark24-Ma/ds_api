@@ -1,6 +1,6 @@
 import { User } from '../../domain/entities/user.entity';
 import { Model } from 'mongoose';
-import { UserDocument } from './user.schema';
+import { UserDocument } from '../user.schema';
 export declare class UserRepository {
     private userModel;
     constructor(userModel: Model<UserDocument>);

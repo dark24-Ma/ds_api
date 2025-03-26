@@ -9,7 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
-const user_schema_1 = require("./infrastructure/repository/user.schema");
+const user_schema_1 = require("./infrastructure/user.schema");
 const user_controller_1 = require("./application/controllers/user.controller");
 const user_repository_1 = require("./infrastructure/repository/user.repository");
 const dotenv = require("dotenv");
@@ -20,6 +20,10 @@ const auth_service_1 = require("./application/services/auth.service");
 const passport_1 = require("@nestjs/passport");
 const jwt_strategy_1 = require("./application/strategies/jwt.strategy");
 const email_service_1 = require("./application/services/email.service");
+const newsletter_schema_1 = require("./infrastructure/newsletter.schema");
+const newsletter_controller_1 = require("./application/controllers/newsletter.controller");
+const newsletter_service_1 = require("./application/services/newsletter.service");
+const newsletter_repository_1 = require("./infrastructure/repository/newsletter.repository");
 dotenv.config();
 let AppModule = class AppModule {
 };
@@ -28,20 +32,25 @@ exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             mongoose_1.MongooseModule.forRoot(process.env.MONGODB_URI),
-            mongoose_1.MongooseModule.forFeature([{ name: 'User', schema: user_schema_1.userModel }]),
+            mongoose_1.MongooseModule.forFeature([
+                { name: 'User', schema: user_schema_1.userModel },
+                { name: 'Newsletter', schema: newsletter_schema_1.NewsletterModel },
+            ]),
             jwt_1.JwtModule.register({
                 secret: process.env.JWT_SECRET || 'defaultSecret',
                 signOptions: { expiresIn: '3600s' },
             }),
             passport_1.PassportModule.register({ defaultStrategy: 'jwt' }),
         ],
-        controllers: [user_controller_1.UserController, auth_controller_1.AuthController],
+        controllers: [user_controller_1.UserController, auth_controller_1.AuthController, newsletter_controller_1.NewsletterController],
         providers: [
             user_repository_1.UserRepository,
             create_user_use_case_1.CreateUserUseCase,
             auth_service_1.AuthService,
             jwt_strategy_1.JwtStrategy,
             email_service_1.EmailService,
+            newsletter_service_1.NewsletterService,
+            newsletter_repository_1.NewsletterRepository,
         ],
     })
 ], AppModule);

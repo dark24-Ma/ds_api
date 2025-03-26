@@ -151,12 +151,51 @@ let EmailService = class EmailService {
         
         <div style="text-align: center; margin-top: 20px; padding: 20px; color: #666; font-size: 12px;">
           <p>Cet e-mail a été envoyé automatiquement, merci de ne pas y répondre.</p>
-          <p>© ${new Date().getFullYear()} Votre App. Tous droits réservés.</p>
+          <p>© ${new Date().getFullYear()} DS EDUCATION. Tous droits réservés.</p>
         </div>
       </div>
     `,
         };
         await this.transporter.sendMail(mailOptions);
+    }
+    async sendNewsletterWelcome(to) {
+        const mailOptions = {
+            from: '"DS EDUCATION" <lirsitogo2021@gmail.com>',
+            to,
+            subject: 'Bienvenue à notre Newsletter !',
+            html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background-color: #f8f9fa; padding: 20px; text-align: center;">
+          <h1 style="color: #333;">Merci de votre inscription !</h1>
+        </div>
+        
+        <div style="padding: 20px; background-color: white; border-radius: 5px; margin-top: 20px;">
+          <p style="color: #666;">Bonjour,</p>
+          
+          <p style="color: #666; line-height: 1.6;">
+            Merci de vous être inscrit à notre newsletter. Vous recevrez désormais nos dernières actualités et mises à jour.
+          </p>
+          
+          <p style="color: #666; font-size: 14px;">
+            Pour vous désabonner, cliquez sur ce lien : 
+            <a href="http://votre-site.com/unsubscribe?email=${to}">Se désabonner</a>
+          </p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px; padding: 20px; color: #666; font-size: 12px;">
+          <p>© ${new Date().getFullYear()} DS EDUCATION. Tous droits réservés.</p>
+        </div>
+      </div>
+    `,
+        };
+        try {
+            await this.transporter.sendMail(mailOptions);
+            console.log('Email de bienvenue newsletter envoyé avec succès');
+        }
+        catch (error) {
+            console.error("Erreur lors de l'envoi de l'email:", error);
+            throw new Error("Erreur lors de l'envoi de l'email de bienvenue newsletter");
+        }
     }
 };
 exports.EmailService = EmailService;
