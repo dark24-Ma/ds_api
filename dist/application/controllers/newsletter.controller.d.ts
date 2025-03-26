@@ -12,5 +12,5 @@ export declare class NewsletterController {
     }): Promise<{
         message: string;
     }>;
-    getSubscribers(): Promise<string[]>;
+    getSubscribers(): Promise<any>;
 }

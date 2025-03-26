@@ -37,7 +37,13 @@ let NewsletterService = class NewsletterService {
     }
     async getAllSubscribed() {
         const newsletters = await this.newsletterRepository.getAllSubscribed();
-        return newsletters.map((n) => n.email);
+        return newsletters.map((newsletter) => ({
+            id: newsletter._id.toString(),
+            email: newsletter.email,
+            isSubscribed: newsletter.isSubscribed,
+            subscribedAt: newsletter.subscribedAt,
+            unsubscribedAt: newsletter.unsubscribedAt,
+        }));
     }
 };
 exports.NewsletterService = NewsletterService;

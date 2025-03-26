@@ -7,6 +7,14 @@ import {
 import { NewsletterRepository } from '../../infrastructure/repository/newsletter.repository';
 import { EmailService } from './email.service';
 
+// Définir une interface pour la réponse
+interface NewsletterResponse {
+  id: string;
+  email: string;
+  isSubscribed: boolean;
+  subscribedAt: Date;
+  unsubscribedAt?: Date;
+}
 @Injectable()
 export class NewsletterService {
   constructor(
@@ -39,8 +47,14 @@ export class NewsletterService {
     await this.emailService.sendNewsletterWelcome(email);
   }
 
-  async getAllSubscribed(): Promise<string[]> {
+  async getAllSubscribed(): Promise<NewsletterResponse[]> {
     const newsletters = await this.newsletterRepository.getAllSubscribed();
-    return newsletters.map((n) => n.email);
+    return newsletters.map((newsletter) => ({
+      id: newsletter._id.toString(), // Convertir l'ObjectId en string
+      email: newsletter.email,
+      isSubscribed: newsletter.isSubscribed,
+      subscribedAt: newsletter.subscribedAt,
+      unsubscribedAt: newsletter.unsubscribedAt,
+    }));
   }
 }

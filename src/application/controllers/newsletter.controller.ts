@@ -21,7 +21,7 @@ export class NewsletterController {
 
   @UseGuards(JwtAuthGuard)
   @Get('subscribers')
-  async getSubscribers() {
+  async getSubscribers(): Promise<any> {
     return this.newsletterService.getAllSubscribed();
   }
 }
