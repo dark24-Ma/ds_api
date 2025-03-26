@@ -23,4 +23,6 @@ export declare class UserRepository {
     } & {
         __v: number;
     }>;
+    update(userId: string, updateData: any): Promise<UserDocument | null>;
+    findById(userId: string): Promise<UserDocument | null>;
 }

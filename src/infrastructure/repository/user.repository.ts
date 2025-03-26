@@ -52,4 +52,14 @@ export class UserRepository {
       .findOneAndUpdate({ resetToken: userToken }, { password: newPassword })
       .exec();
   }
+
+  async update(userId: string, updateData: any): Promise<UserDocument | null> {
+    return this.userModel
+      .findByIdAndUpdate(userId, updateData, { new: true })
+      .exec();
+  }
+
+  async findById(userId: string): Promise<UserDocument | null> {
+    return this.userModel.findById(userId).exec();
+  }
 }

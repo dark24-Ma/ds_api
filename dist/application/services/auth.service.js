@@ -17,19 +17,20 @@ const user_repository_1 = require("../../infrastructure/repository/user.reposito
 const bcrypt = require("bcrypt");
 const email_service_1 = require("./email.service");
 const uuid_1 = require("uuid");
+const user_type_enum_1 = require("../../domain/enums/user-type.enum");
 let AuthService = class AuthService {
     constructor(userRepository, jwtService, emailService) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.emailService = emailService;
     }
-    async register(name, email, password, firstname) {
+    async register(name, email, password, firstname, userType) {
         const existingUser = await this.userRepository.findByEmail(email);
         if (existingUser) {
             throw new common_1.ConflictException("L'email est déjà utilisé");
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new user_entity_1.User(Date.now().toString(), name, email, hashedPassword, firstname);
+        const user = new user_entity_1.User(Date.now().toString(), name, email, hashedPassword, firstname, userType || user_type_enum_1.UserType.CLIENT);
         user.password = hashedPassword;
         const newUser = await this.userRepository.save(user);
         await this.emailService.sendWelcomeEmail(email, name);

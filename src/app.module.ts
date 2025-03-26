@@ -17,6 +17,7 @@ import { NewsletterModel } from './infrastructure/newsletter.schema';
 import { NewsletterController } from './application/controllers/newsletter.controller';
 import { NewsletterService } from './application/services/newsletter.service';
 import { NewsletterRepository } from './infrastructure/repository/newsletter.repository';
+import { UserService } from './application/services/user.service';
 dotenv.config();
 
 @Module({
@@ -32,7 +33,12 @@ dotenv.config();
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
-  controllers: [UserController, AuthController, NewsletterController],
+  controllers: [
+    UserController,
+    AuthController,
+    NewsletterController,
+    UserController,
+  ],
   providers: [
     UserRepository,
     CreateUserUseCase,
@@ -41,6 +47,7 @@ dotenv.config();
     EmailService,
     NewsletterService,
     NewsletterRepository,
+    UserService,
   ],
 })
 export class AppModule {}

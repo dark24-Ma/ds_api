@@ -20,7 +20,7 @@ let AuthController = class AuthController {
         this.authService = authService;
     }
     async register(body) {
-        return this.authService.register(body.name, body.email, body.password, body.firstname);
+        return this.authService.register(body.name, body.email, body.password, body.firstname, body.userType);
     }
     async login(body) {
         const user = await this.authService.validateUser(body.email, body.password);

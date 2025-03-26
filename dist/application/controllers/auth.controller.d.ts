@@ -7,6 +7,7 @@ export declare class AuthController {
         email: string;
         password: string;
         firstname: string;
+        userType: string;
     }): Promise<import("../../domain/entities/user.entity").User>;
     login(body: {
         email: string;

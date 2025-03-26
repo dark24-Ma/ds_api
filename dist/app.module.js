@@ -24,6 +24,7 @@ const newsletter_schema_1 = require("./infrastructure/newsletter.schema");
 const newsletter_controller_1 = require("./application/controllers/newsletter.controller");
 const newsletter_service_1 = require("./application/services/newsletter.service");
 const newsletter_repository_1 = require("./infrastructure/repository/newsletter.repository");
+const user_service_1 = require("./application/services/user.service");
 dotenv.config();
 let AppModule = class AppModule {
 };
@@ -42,7 +43,12 @@ exports.AppModule = AppModule = __decorate([
             }),
             passport_1.PassportModule.register({ defaultStrategy: 'jwt' }),
         ],
-        controllers: [user_controller_1.UserController, auth_controller_1.AuthController, newsletter_controller_1.NewsletterController],
+        controllers: [
+            user_controller_1.UserController,
+            auth_controller_1.AuthController,
+            newsletter_controller_1.NewsletterController,
+            user_controller_1.UserController,
+        ],
         providers: [
             user_repository_1.UserRepository,
             create_user_use_case_1.CreateUserUseCase,
@@ -51,6 +57,7 @@ exports.AppModule = AppModule = __decorate([
             email_service_1.EmailService,
             newsletter_service_1.NewsletterService,
             newsletter_repository_1.NewsletterRepository,
+            user_service_1.UserService,
         ],
     })
 ], AppModule);

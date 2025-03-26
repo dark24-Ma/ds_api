@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.userModel = exports.UserSchema = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const user_entity_1 = require("../domain/entities/user.entity");
+const user_type_enum_1 = require("../domain/enums/user-type.enum");
 let UserSchema = class UserSchema extends user_entity_1.User {
 };
 exports.UserSchema = UserSchema;
@@ -35,6 +36,14 @@ __decorate([
     (0, mongoose_1.Prop)({ required: false }),
     __metadata("design:type", String)
 ], UserSchema.prototype, "resetToken", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: String, enum: user_type_enum_1.UserType, default: user_type_enum_1.UserType.CLIENT }),
+    __metadata("design:type", String)
+], UserSchema.prototype, "userType", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false }),
+    __metadata("design:type", String)
+], UserSchema.prototype, "phonenumber", void 0);
 exports.UserSchema = UserSchema = __decorate([
     (0, mongoose_1.Schema)()
 ], UserSchema);

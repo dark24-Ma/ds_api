@@ -20,6 +20,7 @@ export class AuthController {
       email: string;
       password: string;
       firstname: string;
+      userType: string;
     },
   ) {
     return this.authService.register(
@@ -27,6 +28,7 @@ export class AuthController {
       body.email,
       body.password,
       body.firstname,
+      body.userType,
     );
   }
 

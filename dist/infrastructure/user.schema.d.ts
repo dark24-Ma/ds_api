@@ -1,4 +1,5 @@
 import { User } from 'src/domain/entities/user.entity';
+import { UserType } from 'src/domain/enums/user-type.enum';
 export type UserDocument = User & Document;
 export declare class UserSchema extends User {
     name: string;
@@ -6,6 +7,8 @@ export declare class UserSchema extends User {
     firstname: string;
     password: string;
     resetToken: string;
+    userType: UserType;
+    phonenumber: string;
 }
 export declare const userModel: import("mongoose").Schema<UserSchema, import("mongoose").Model<UserSchema, any, any, any, import("mongoose").Document<unknown, any, UserSchema> & UserSchema & {
     _id: import("mongoose").Types.ObjectId;

@@ -7,7 +7,7 @@ export declare class AuthService {
     private jwtService;
     private emailService;
     constructor(userRepository: UserRepository, jwtService: JwtService, emailService: EmailService);
-    register(name: string, email: string, password: string, firstname: string): Promise<User>;
+    register(name: string, email: string, password: string, firstname: string, userType: string): Promise<User>;
     validateUser(email: string, password: string): Promise<User | null>;
     login(user: User): Promise<{
         access_token: string;

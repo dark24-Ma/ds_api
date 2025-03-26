@@ -9,6 +9,7 @@ import { UserRepository } from 'src/infrastructure/repository/user.repository';
 import * as bcrypt from 'bcrypt';
 import { EmailService } from './email.service';
 import { v4 as uuidv4 } from 'uuid';
+import { UserType } from 'src/domain/enums/user-type.enum';
 @Injectable()
 export class AuthService {
   constructor(
@@ -22,6 +23,8 @@ export class AuthService {
     email: string,
     password: string,
     firstname: string,
+    userType: string,
+    // phonenumber: string,
   ): Promise<User> {
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
@@ -35,6 +38,8 @@ export class AuthService {
       email,
       hashedPassword,
       firstname,
+      userType || UserType.CLIENT,
+      // phonenumber,
     );
     user.password = hashedPassword;
     const newUser = await this.userRepository.save(user);
