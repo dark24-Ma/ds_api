@@ -88,5 +88,4 @@ export class AuthService {
     user.resetTokenExpiration = null;
     await this.userRepository.save(user);
   }
-
 }

@@ -18,7 +18,6 @@ export class UserSchema extends User {
 
   @Prop({ required: false })
   resetToken: string;
-
 }
 
 export const userModel = SchemaFactory.createForClass(UserSchema);
