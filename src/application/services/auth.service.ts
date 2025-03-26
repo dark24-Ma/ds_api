@@ -9,7 +9,6 @@ import { UserRepository } from 'src/infrastructure/repository/user.repository';
 import * as bcrypt from 'bcrypt';
 import { EmailService } from './email.service';
 import { v4 as uuidv4 } from 'uuid';
-
 @Injectable()
 export class AuthService {
   constructor(
@@ -28,6 +27,7 @@ export class AuthService {
     if (existingUser) {
       throw new ConflictException("L'email est déjà utilisé");
     }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User(
       Date.now().toString(),
@@ -88,4 +88,5 @@ export class AuthService {
     user.resetTokenExpiration = null;
     await this.userRepository.save(user);
   }
+
 }

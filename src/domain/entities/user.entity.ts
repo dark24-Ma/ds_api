@@ -7,5 +7,6 @@ export class User {
     public firstname: string,
     public resetToken?: string,
     public resetTokenExpiration?: number,
+
   ) {}
 }
