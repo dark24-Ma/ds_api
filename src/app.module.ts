@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { Module } from '@nestjs/common';
 // import { AppController } from './app.controller';
 // import { AppService } from './app.service';
@@ -24,6 +25,17 @@ import { NewsletterSenderController } from './application/controllers/newsletter
 import { NewsletterSenderService } from './application/services/newsletter-sender.service';
 import { NewsletterTemplateService } from './application/services/newsletter-template.service';
 import { NewsletterTemplateRepository } from './infrastructure/repository/newsletter-template.repository';
+import { CourseModel } from './infrastructure/course.schema';
+import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import * as path from 'path';
+// import * as crypto from 'crypto';
+import { CourseController } from './application/controllers/course.controller';
+import { CourseSenderController } from './application/controllers/course-sender.controller';
+import { CourseService } from './application/services/course.service';
+import { CourseSenderService } from './application/services/course-sender.service';
+import { FileUploadService } from './application/services/file-upload.service';
+import { CourseRepository } from './infrastructure/repository/course.repository';
 dotenv.config();
 
 @Module({
@@ -33,7 +45,23 @@ dotenv.config();
       { name: 'User', schema: userModel },
       { name: 'Newsletter', schema: NewsletterModel },
       { name: 'NewsletterTemplate', schema: NewsletterTemplateModel },
+      { name: 'Course', schema: CourseModel },
     ]),
+    MulterModule.register({
+      storage: diskStorage({
+        destination: (req, file, cb) => {
+          // Créer le dossier s'il n'existe pas
+          const uploadPath = path.join(process.cwd(), 'uploads');
+          require('fs').mkdirSync(uploadPath, { recursive: true });
+          cb(null, uploadPath);
+        },
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, uniqueSuffix + path.extname(file.originalname));
+        },
+      }),
+    }),
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'defaultSecret',
       signOptions: { expiresIn: '3600s' },
@@ -47,6 +75,8 @@ dotenv.config();
     UserController,
     NewsletterTemplateController,
     NewsletterSenderController,
+    CourseController,
+    CourseSenderController,
   ],
   providers: [
     UserRepository,
@@ -61,6 +91,10 @@ dotenv.config();
     NewsletterSenderService,
     NewsletterTemplateService,
     NewsletterTemplateRepository,
+    CourseService,
+    CourseSenderService,
+    FileUploadService,
+    CourseRepository,
   ],
 })
 export class AppModule {}

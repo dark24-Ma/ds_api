@@ -217,4 +217,54 @@ export class EmailService {
       throw new Error(`Erreur lors de l'envoi de l'email: ${error.message}`);
     }
   }
+
+  async sendCourseEmail(
+    to: string,
+    title: string,
+    description: string,
+    resourceUrl: string,
+    resourceType: string,
+  ) {
+    // Construire le contenu HTML
+    const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background-color: #f8f9fa; padding: 20px; text-align: center;">
+        <h1 style="color: #333;">Nouveau cours disponible !</h1>
+      </div>
+      
+      <div style="padding: 20px; background-color: white; border-radius: 5px; margin-top: 20px;">
+        <h2 style="color: #007bff;">${title}</h2>
+        
+        <p style="color: #666; line-height: 1.6;">
+          ${description}
+        </p>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${process.env.FRONTEND_URL}/courses/${resourceUrl}" 
+             style="background-color: #007bff; 
+                    color: white; 
+                    padding: 12px 25px; 
+                    text-decoration: none; 
+                    border-radius: 5px;
+                    display: inline-block;">
+            ${resourceType === 'pdf' ? 'Télécharger le PDF' : 'Voir la vidéo'}
+          </a>
+        </div>
+      </div>
+      
+      <div style="text-align: center; margin-top: 20px; padding: 20px; color: #666; font-size: 12px;">
+        <p>© ${new Date().getFullYear()} DS EDUCATION. Tous droits réservés.</p>
+      </div>
+    </div>
+  `;
+
+    const mailOptions = {
+      from: '"DS EDUCATION" <lirsitogo2021@gmail.com>',
+      to,
+      subject: `Nouveau cours : ${title}`,
+      html,
+    };
+
+    await this.transporter.sendMail(mailOptions);
+  }
 }
