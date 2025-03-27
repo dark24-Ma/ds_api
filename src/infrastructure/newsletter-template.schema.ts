@@ -4,7 +4,7 @@ import { Document } from 'mongoose';
 
 @Schema()
 export class NewsletterTemplateSchema {
-  @Prop({ required: true })
+  @Prop({ required: false })
   name: string;
 
   @Prop({ required: true })
@@ -18,6 +18,9 @@ export class NewsletterTemplateSchema {
 
   @Prop({ default: Date.now })
   updatedAt: Date;
+
+  @Prop({ required: false })
+  status: string;
 }
 
 export type NewsletterTemplateDocument = NewsletterTemplateSchema & Document;

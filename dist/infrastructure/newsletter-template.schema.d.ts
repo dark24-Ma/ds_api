@@ -5,6 +5,7 @@ export declare class NewsletterTemplateSchema {
     content: string;
     createdAt: Date;
     updatedAt: Date;
+    status: string;
 }
 export type NewsletterTemplateDocument = NewsletterTemplateSchema & Document;
 export declare const NewsletterTemplateModel: import("mongoose").Schema<NewsletterTemplateSchema, import("mongoose").Model<NewsletterTemplateSchema, any, any, any, Document<unknown, any, NewsletterTemplateSchema> & NewsletterTemplateSchema & {

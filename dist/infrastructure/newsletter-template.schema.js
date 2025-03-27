@@ -15,7 +15,7 @@ let NewsletterTemplateSchema = class NewsletterTemplateSchema {
 };
 exports.NewsletterTemplateSchema = NewsletterTemplateSchema;
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: false }),
     __metadata("design:type", String)
 ], NewsletterTemplateSchema.prototype, "name", void 0);
 __decorate([
@@ -34,6 +34,10 @@ __decorate([
     (0, mongoose_1.Prop)({ default: Date.now }),
     __metadata("design:type", Date)
 ], NewsletterTemplateSchema.prototype, "updatedAt", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false }),
+    __metadata("design:type", String)
+], NewsletterTemplateSchema.prototype, "status", void 0);
 exports.NewsletterTemplateSchema = NewsletterTemplateSchema = __decorate([
     (0, mongoose_1.Schema)()
 ], NewsletterTemplateSchema);
