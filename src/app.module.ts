@@ -18,6 +18,12 @@ import { NewsletterController } from './application/controllers/newsletter.contr
 import { NewsletterService } from './application/services/newsletter.service';
 import { NewsletterRepository } from './infrastructure/repository/newsletter.repository';
 import { UserService } from './application/services/user.service';
+import { NewsletterTemplateModel } from './infrastructure/newsletter-template.schema';
+import { NewsletterTemplateController } from './application/controllers/newsletter-template.controller';
+import { NewsletterSenderController } from './application/controllers/newsletter-send.controller';
+import { NewsletterSenderService } from './application/services/newsletter-sender.service';
+import { NewsletterTemplateService } from './application/services/newsletter-template.service';
+import { NewsletterTemplateRepository } from './infrastructure/repository/newsletter-template.repository';
 dotenv.config();
 
 @Module({
@@ -26,6 +32,7 @@ dotenv.config();
     MongooseModule.forFeature([
       { name: 'User', schema: userModel },
       { name: 'Newsletter', schema: NewsletterModel },
+      { name: 'NewsletterTemplate', schema: NewsletterTemplateModel },
     ]),
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'defaultSecret',
@@ -38,6 +45,8 @@ dotenv.config();
     AuthController,
     NewsletterController,
     UserController,
+    NewsletterTemplateController,
+    NewsletterSenderController,
   ],
   providers: [
     UserRepository,
@@ -48,6 +57,10 @@ dotenv.config();
     NewsletterService,
     NewsletterRepository,
     UserService,
+    NewsletterService,
+    NewsletterSenderService,
+    NewsletterTemplateService,
+    NewsletterTemplateRepository,
   ],
 })
 export class AppModule {}

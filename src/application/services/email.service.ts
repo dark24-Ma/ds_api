@@ -8,17 +8,17 @@ export class EmailService {
   constructor() {
     this.transporter = nodemailer.createTransport({
       service: 'gmail',
-      secure: true, // true pour 465, false pour d'autres ports
+      secure: true,
       auth: {
-        user: 'lirsitogo2021@gmail.com', // Remplacez par votre adresse e-mail
-        pass: 'phlelzqtfdpuvalx', // Remplacez par votre mot de passe
+        user: 'lirsitogo2021@gmail.com',
+        pass: 'phlelzqtfdpuvalx',
       },
     });
   }
 
   async sendWelcomeEmail(to: string, name: string) {
     const mailOptions = {
-      from: '"DS EDUCATION" <your-email@example.com>', // Adresse de l'expéditeur
+      from: '"DS EDUCATION" <your-email@example.com>',
       to,
       subject: 'Bienvenue sur notre application !',
       text: `
@@ -81,7 +81,6 @@ export class EmailService {
     await this.transporter.sendMail(mailOptions);
   }
 
-  // src/application/services/email.service.ts
   async sendPasswordResetEmail(to: string, resetLink: string) {
     const mailOptions = {
       from: '"DS EDUCATION" <your-email@example.com>',
@@ -156,9 +155,6 @@ export class EmailService {
     await this.transporter.sendMail(mailOptions);
   }
 
-  // src/application/services/email.service.ts
-  // Ajouter cette méthode à votre EmailService existant
-
   async sendNewsletterWelcome(to: string) {
     const mailOptions = {
       from: '"DS EDUCATION" <lirsitogo2021@gmail.com>',
@@ -198,6 +194,27 @@ export class EmailService {
       throw new Error(
         "Erreur lors de l'envoi de l'email de bienvenue newsletter",
       );
+    }
+  }
+
+  async sendNewsletterToSubscriber(
+    to: string,
+    subject: string,
+    htmlContent: string,
+  ) {
+    const mailOptions = {
+      from: '"DS EDUCATION" <lirsitogo2021@gmail.com>',
+      to,
+      subject,
+      html: htmlContent,
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      console.log(`Newsletter envoyée avec succès à ${to}`);
+    } catch (error) {
+      console.error(`Erreur lors de l'envoi de la newsletter à ${to}:`, error);
+      throw new Error(`Erreur lors de l'envoi de l'email: ${error.message}`);
     }
   }
 }

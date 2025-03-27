@@ -49,6 +49,7 @@ let AuthService = class AuthService {
             firstname: user.firstname,
             email: user.email,
             userType: user.userType,
+            phonenumber: user.phonenumber,
             sub: user.id,
         };
         return {

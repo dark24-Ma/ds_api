@@ -25,6 +25,12 @@ const newsletter_controller_1 = require("./application/controllers/newsletter.co
 const newsletter_service_1 = require("./application/services/newsletter.service");
 const newsletter_repository_1 = require("./infrastructure/repository/newsletter.repository");
 const user_service_1 = require("./application/services/user.service");
+const newsletter_template_schema_1 = require("./infrastructure/newsletter-template.schema");
+const newsletter_template_controller_1 = require("./application/controllers/newsletter-template.controller");
+const newsletter_send_controller_1 = require("./application/controllers/newsletter-send.controller");
+const newsletter_sender_service_1 = require("./application/services/newsletter-sender.service");
+const newsletter_template_service_1 = require("./application/services/newsletter-template.service");
+const newsletter_template_repository_1 = require("./infrastructure/repository/newsletter-template.repository");
 dotenv.config();
 let AppModule = class AppModule {
 };
@@ -36,6 +42,7 @@ exports.AppModule = AppModule = __decorate([
             mongoose_1.MongooseModule.forFeature([
                 { name: 'User', schema: user_schema_1.userModel },
                 { name: 'Newsletter', schema: newsletter_schema_1.NewsletterModel },
+                { name: 'NewsletterTemplate', schema: newsletter_template_schema_1.NewsletterTemplateModel },
             ]),
             jwt_1.JwtModule.register({
                 secret: process.env.JWT_SECRET || 'defaultSecret',
@@ -48,6 +55,8 @@ exports.AppModule = AppModule = __decorate([
             auth_controller_1.AuthController,
             newsletter_controller_1.NewsletterController,
             user_controller_1.UserController,
+            newsletter_template_controller_1.NewsletterTemplateController,
+            newsletter_send_controller_1.NewsletterSenderController,
         ],
         providers: [
             user_repository_1.UserRepository,
@@ -58,6 +67,10 @@ exports.AppModule = AppModule = __decorate([
             newsletter_service_1.NewsletterService,
             newsletter_repository_1.NewsletterRepository,
             user_service_1.UserService,
+            newsletter_service_1.NewsletterService,
+            newsletter_sender_service_1.NewsletterSenderService,
+            newsletter_template_service_1.NewsletterTemplateService,
+            newsletter_template_repository_1.NewsletterTemplateRepository,
         ],
     })
 ], AppModule);

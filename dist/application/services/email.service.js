@@ -197,6 +197,22 @@ let EmailService = class EmailService {
             throw new Error("Erreur lors de l'envoi de l'email de bienvenue newsletter");
         }
     }
+    async sendNewsletterToSubscriber(to, subject, htmlContent) {
+        const mailOptions = {
+            from: '"DS EDUCATION" <lirsitogo2021@gmail.com>',
+            to,
+            subject,
+            html: htmlContent,
+        };
+        try {
+            await this.transporter.sendMail(mailOptions);
+            console.log(`Newsletter envoyée avec succès à ${to}`);
+        }
+        catch (error) {
+            console.error(`Erreur lors de l'envoi de la newsletter à ${to}:`, error);
+            throw new Error(`Erreur lors de l'envoi de l'email: ${error.message}`);
+        }
+    }
 };
 exports.EmailService = EmailService;
 exports.EmailService = EmailService = __decorate([
