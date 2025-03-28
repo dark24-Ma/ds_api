@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { CourseRepository } from '../../infrastructure/repository/course.repository';
 import { FileUploadService } from './file-upload.service';
+import { UserSubscriptionService } from './user-subscription.service';
 // import { ResourceType } from '../../infrastructure/repository/course.schema';
 // import { ResourceType } from 'src/domain/enums/course.enum';
 import { UserType } from '../../domain/enums/user-type.enum';
@@ -31,6 +32,7 @@ export class CourseService {
   constructor(
     private courseRepository: CourseRepository,
     private fileUploadService: FileUploadService,
+    private userSubscriptionService: UserSubscriptionService,
   ) {}
 
   async createCourse(
@@ -193,6 +195,37 @@ export class CourseService {
       title: course.title,
       type: course.resourceType,
     };
+  }
+
+  async canAccessCourse(userId: string, courseId: string): Promise<boolean> {
+    const course = await this.courseRepository.findById(courseId);
+    if (!course) {
+      throw new NotFoundException('Cours non trouvé');
+    }
+
+    // Si le cours n'a pas de restrictions d'abonnement
+    if (course.requiredSubscriptionTypes.length === 0) {
+      return true;
+    }
+
+    // Vérifier l'abonnement de l'utilisateur
+    try {
+      const userSubscription =
+        await this.userSubscriptionService.getUserSubscription(userId);
+
+      // Vérifier si l'abonnement de l'utilisateur est valide
+      if (userSubscription.isActive && new Date() <= userSubscription.endDate) {
+        // Vérifier si l'abonnement donne accès à ce cours
+        return course.requiredSubscriptionTypes.includes(
+          userSubscription.subscriptionTypeId,
+        );
+      }
+    } catch (error) {
+      // Si l'utilisateur n'a pas d'abonnement
+      return false;
+    }
+
+    return false;
   }
 
   private formatCourseResponse(course) {

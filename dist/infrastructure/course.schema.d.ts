@@ -19,6 +19,7 @@ export declare class CourseSchema {
     createdAt: Date;
     updatedAt: Date;
     createdBy: MongooseSchema.Types.ObjectId;
+    requiredSubscriptionTypes: string[];
 }
 export type CourseDocument = CourseSchema & Document;
 export declare const CourseModel: MongooseSchema<CourseSchema, import("mongoose").Model<CourseSchema, any, any, any, Document<unknown, any, CourseSchema> & CourseSchema & {

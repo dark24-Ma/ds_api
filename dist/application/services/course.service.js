@@ -13,10 +13,12 @@ exports.CourseService = void 0;
 const common_1 = require("@nestjs/common");
 const course_repository_1 = require("../../infrastructure/repository/course.repository");
 const file_upload_service_1 = require("./file-upload.service");
+const user_subscription_service_1 = require("./user-subscription.service");
 let CourseService = class CourseService {
-    constructor(courseRepository, fileUploadService) {
+    constructor(courseRepository, fileUploadService, userSubscriptionService) {
         this.courseRepository = courseRepository;
         this.fileUploadService = fileUploadService;
+        this.userSubscriptionService = userSubscriptionService;
     }
     async createCourse(courseData, file, thumbnail) {
         console.log('CreateCourse - File info:', file
@@ -128,6 +130,25 @@ let CourseService = class CourseService {
             type: course.resourceType,
         };
     }
+    async canAccessCourse(userId, courseId) {
+        const course = await this.courseRepository.findById(courseId);
+        if (!course) {
+            throw new common_1.NotFoundException('Cours non trouvé');
+        }
+        if (course.requiredSubscriptionTypes.length === 0) {
+            return true;
+        }
+        try {
+            const userSubscription = await this.userSubscriptionService.getUserSubscription(userId);
+            if (userSubscription.isActive && new Date() <= userSubscription.endDate) {
+                return course.requiredSubscriptionTypes.includes(userSubscription.subscriptionTypeId);
+            }
+        }
+        catch (error) {
+            return false;
+        }
+        return false;
+    }
     formatCourseResponse(course) {
         return {
             id: course._id,
@@ -151,6 +172,7 @@ exports.CourseService = CourseService;
 exports.CourseService = CourseService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [course_repository_1.CourseRepository,
-        file_upload_service_1.FileUploadService])
+        file_upload_service_1.FileUploadService,
+        user_subscription_service_1.UserSubscriptionService])
 ], CourseService);
 //# sourceMappingURL=course.service.js.map

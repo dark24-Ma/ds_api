@@ -1,5 +1,6 @@
 import { CourseRepository } from '../../infrastructure/repository/course.repository';
 import { FileUploadService } from './file-upload.service';
+import { UserSubscriptionService } from './user-subscription.service';
 import { UserType } from '../../domain/enums/user-type.enum';
 export interface UploadedFile {
     buffer?: Buffer;
@@ -15,7 +16,8 @@ export interface UploadedFile {
 export declare class CourseService {
     private courseRepository;
     private fileUploadService;
-    constructor(courseRepository: CourseRepository, fileUploadService: FileUploadService);
+    private userSubscriptionService;
+    constructor(courseRepository: CourseRepository, fileUploadService: FileUploadService, userSubscriptionService: UserSubscriptionService);
     createCourse(courseData: any, file?: UploadedFile, thumbnail?: UploadedFile): Promise<{
         id: any;
         title: any;
@@ -104,5 +106,6 @@ export declare class CourseService {
         title: string;
         type: import("../../infrastructure/course.schema").ResourceType;
     }>;
+    canAccessCourse(userId: string, courseId: string): Promise<boolean>;
     private formatCourseResponse;
 }

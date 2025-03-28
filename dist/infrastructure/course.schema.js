@@ -73,6 +73,10 @@ __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }),
     __metadata("design:type", mongoose_2.Schema.Types.ObjectId)
 ], CourseSchema.prototype, "createdBy", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: [{ type: String, ref: 'SubscriptionType' }], default: [] }),
+    __metadata("design:type", Array)
+], CourseSchema.prototype, "requiredSubscriptionTypes", void 0);
 exports.CourseSchema = CourseSchema = __decorate([
     (0, mongoose_1.Schema)()
 ], CourseSchema);

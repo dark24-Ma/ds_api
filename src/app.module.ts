@@ -36,6 +36,17 @@ import { CourseService } from './application/services/course.service';
 import { CourseSenderService } from './application/services/course-sender.service';
 import { FileUploadService } from './application/services/file-upload.service';
 import { CourseRepository } from './infrastructure/repository/course.repository';
+// import { SubscriptionTypeController } from './application/controllers/subscription-type.controller';
+import { UserSubscriptionController } from './application/controllers/user-subscription.controller';
+import { SubscriptionTypeService } from './application/services/subscription-type.service';
+import { UserSubscriptionService } from './application/services/user-subscription.service';
+import { SubscriptionTypeRepository } from './infrastructure/repository/subscription-type.repository';
+import { UserSubscriptionRepository } from './infrastructure/repository/user-subscription.repository';
+import { SubscriptionTypeModel } from './infrastructure/subscription-type.schema';
+import { UserSubscriptionModel } from './infrastructure/user-subscription.schema';
+import { SubscriptionTypeController } from './application/controllers/subscription-type.controller';
+// import { SubscriptionTypeModel } from './infrastructure/repository/subscription-type.schema';
+// import { UserSubscriptionModel } from './infrastructure/repository/user-subscription.schema';
 dotenv.config();
 
 @Module({
@@ -46,6 +57,8 @@ dotenv.config();
       { name: 'Newsletter', schema: NewsletterModel },
       { name: 'NewsletterTemplate', schema: NewsletterTemplateModel },
       { name: 'Course', schema: CourseModel },
+      { name: 'SubscriptionType', schema: SubscriptionTypeModel },
+      { name: 'UserSubscription', schema: UserSubscriptionModel },
     ]),
     MulterModule.register({
       storage: diskStorage({
@@ -77,6 +90,8 @@ dotenv.config();
     NewsletterSenderController,
     CourseController,
     CourseSenderController,
+    SubscriptionTypeController,
+    UserSubscriptionController,
   ],
   providers: [
     UserRepository,
@@ -95,6 +110,10 @@ dotenv.config();
     CourseSenderService,
     FileUploadService,
     CourseRepository,
+    SubscriptionTypeService,
+    UserSubscriptionService,
+    SubscriptionTypeRepository,
+    UserSubscriptionRepository,
   ],
 })
 export class AppModule {}

@@ -41,6 +41,14 @@ const course_service_1 = require("./application/services/course.service");
 const course_sender_service_1 = require("./application/services/course-sender.service");
 const file_upload_service_1 = require("./application/services/file-upload.service");
 const course_repository_1 = require("./infrastructure/repository/course.repository");
+const user_subscription_controller_1 = require("./application/controllers/user-subscription.controller");
+const subscription_type_service_1 = require("./application/services/subscription-type.service");
+const user_subscription_service_1 = require("./application/services/user-subscription.service");
+const subscription_type_repository_1 = require("./infrastructure/repository/subscription-type.repository");
+const user_subscription_repository_1 = require("./infrastructure/repository/user-subscription.repository");
+const subscription_type_schema_1 = require("./infrastructure/subscription-type.schema");
+const user_subscription_schema_1 = require("./infrastructure/user-subscription.schema");
+const subscription_type_controller_1 = require("./application/controllers/subscription-type.controller");
 dotenv.config();
 let AppModule = class AppModule {
 };
@@ -54,6 +62,8 @@ exports.AppModule = AppModule = __decorate([
                 { name: 'Newsletter', schema: newsletter_schema_1.NewsletterModel },
                 { name: 'NewsletterTemplate', schema: newsletter_template_schema_1.NewsletterTemplateModel },
                 { name: 'Course', schema: course_schema_1.CourseModel },
+                { name: 'SubscriptionType', schema: subscription_type_schema_1.SubscriptionTypeModel },
+                { name: 'UserSubscription', schema: user_subscription_schema_1.UserSubscriptionModel },
             ]),
             platform_express_1.MulterModule.register({
                 storage: (0, multer_1.diskStorage)({
@@ -83,6 +93,8 @@ exports.AppModule = AppModule = __decorate([
             newsletter_send_controller_1.NewsletterSenderController,
             course_controller_1.CourseController,
             course_sender_controller_1.CourseSenderController,
+            subscription_type_controller_1.SubscriptionTypeController,
+            user_subscription_controller_1.UserSubscriptionController,
         ],
         providers: [
             user_repository_1.UserRepository,
@@ -101,6 +113,10 @@ exports.AppModule = AppModule = __decorate([
             course_sender_service_1.CourseSenderService,
             file_upload_service_1.FileUploadService,
             course_repository_1.CourseRepository,
+            subscription_type_service_1.SubscriptionTypeService,
+            user_subscription_service_1.UserSubscriptionService,
+            subscription_type_repository_1.SubscriptionTypeRepository,
+            user_subscription_repository_1.UserSubscriptionRepository,
         ],
     })
 ], AppModule);

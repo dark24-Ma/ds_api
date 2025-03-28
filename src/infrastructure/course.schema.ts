@@ -50,6 +50,9 @@ export class CourseSchema {
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
   createdBy: MongooseSchema.Types.ObjectId;
+
+  @Prop({ type: [{ type: String, ref: 'SubscriptionType' }], default: [] })
+  requiredSubscriptionTypes: string[];
 }
 
 export type CourseDocument = CourseSchema & Document;
