@@ -70,21 +70,25 @@ let CourseController = class CourseController {
         }
         return this.courseService.downloadFreeCourse(id);
     }
-    async viewCourse(id, req, res) {
+    async viewCourse(id, resourceId, req, res) {
         try {
             const userType = req.user?.userType || null;
-            const courseData = await this.courseService.getCourseForViewing(id, userType);
-            res.setHeader('Content-Disposition', 'inline');
-            res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-            res.setHeader('Pragma', 'no-cache');
-            res.setHeader('Expires', '0');
-            res.setHeader('X-Content-Type-Options', 'nosniff');
+            const courseData = await this.courseService.getCourseForViewing(id, resourceId, userType);
             if (courseData.type === 'pdf') {
-                return res.sendFile(courseData.filePath, {
-                    headers: {
-                        'Content-Type': 'application/pdf',
-                    },
+                res.setHeader('Content-Type', 'application/pdf');
+                res.setHeader('Content-Disposition', 'inline; filename="document.pdf"');
+                res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+                res.setHeader('Pragma', 'no-cache');
+                res.setHeader('Expires', '0');
+                res.setHeader('X-Content-Type-Options', 'nosniff');
+                const fileStream = fs.createReadStream(courseData.filePath);
+                fileStream.on('error', (error) => {
+                    console.error('Erreur de lecture du fichier PDF:', error);
+                    if (!res.headersSent) {
+                        res.status(404).json({ message: 'Fichier non trouvé' });
+                    }
                 });
+                return fileStream.pipe(res);
             }
             if (courseData.type === 'video') {
                 const stat = await fs.promises.stat(courseData.filePath);
@@ -120,6 +124,22 @@ let CourseController = class CourseController {
                 message: error.message || 'Erreur lors de la visualisation du cours'
             });
         }
+    }
+    async addResourceToCourse(id, resourceData, files) {
+        try {
+            const file = files?.file?.[0];
+            return await this.courseService.addResourceToCourse(id, resourceData, file);
+        }
+        catch (error) {
+            console.error('Erreur lors de l\'ajout de la ressource:', error);
+            throw new common_1.BadRequestException(`Erreur lors de l'ajout de la ressource: ${error.message}`);
+        }
+    }
+    async removeResourceFromCourse(courseId, resourceId) {
+        return this.courseService.removeResourceFromCourse(courseId, resourceId);
+    }
+    async updateResourcesOrder(id, orderData) {
+        return this.courseService.updateResourcesOrder(id, orderData.resources);
     }
 };
 exports.CourseController = CourseController;
@@ -205,12 +225,42 @@ __decorate([
 __decorate([
     (0, common_1.Get)(':id/view'),
     __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Request)()),
-    __param(2, (0, common_1.Response)()),
+    __param(1, (0, common_1.Query)('resourceId')),
+    __param(2, (0, common_1.Request)()),
+    __param(3, (0, common_1.Response)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], CourseController.prototype, "viewCourse", null);
+__decorate([
+    (0, common_1.Post)(':id/resources'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([{ name: 'file', maxCount: 1 }])),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", Promise)
-], CourseController.prototype, "viewCourse", null);
+], CourseController.prototype, "addResourceToCourse", null);
+__decorate([
+    (0, common_1.Delete)(':courseId/resources/:resourceId'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Param)('courseId')),
+    __param(1, (0, common_1.Param)('resourceId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], CourseController.prototype, "removeResourceFromCourse", null);
+__decorate([
+    (0, common_1.Put)(':id/resources/order'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], CourseController.prototype, "updateResourcesOrder", null);
 exports.CourseController = CourseController = __decorate([
     (0, common_1.Controller)('courses'),
     __metadata("design:paramtypes", [course_service_1.CourseService])

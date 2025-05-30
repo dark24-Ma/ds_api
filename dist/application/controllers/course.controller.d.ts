@@ -22,6 +22,7 @@ export declare class CourseController {
         createdAt: any;
         updatedAt: any;
         createdBy: any;
+        resources: any;
     }>;
     getAllCourses(): Promise<{
         id: any;
@@ -39,6 +40,7 @@ export declare class CourseController {
         createdAt: any;
         updatedAt: any;
         createdBy: any;
+        resources: any;
     }[]>;
     getFreeCourses(): Promise<{
         id: any;
@@ -56,6 +58,7 @@ export declare class CourseController {
         createdAt: any;
         updatedAt: any;
         createdBy: any;
+        resources: any;
     }[]>;
     getCoursesByUserType(userType: UserType): Promise<{
         id: any;
@@ -73,6 +76,7 @@ export declare class CourseController {
         createdAt: any;
         updatedAt: any;
         createdBy: any;
+        resources: any;
     }[]>;
     getCourseById(id: string): Promise<{
         id: any;
@@ -90,6 +94,7 @@ export declare class CourseController {
         createdAt: any;
         updatedAt: any;
         createdBy: any;
+        resources: any;
     }>;
     updateCourse(id: string, updateData: any, files: {
         file?: Express.Multer.File[];
@@ -110,6 +115,7 @@ export declare class CourseController {
         createdAt: any;
         updatedAt: any;
         createdBy: any;
+        resources: any;
     }>;
     deleteCourse(id: string): Promise<{
         message: string;
@@ -119,5 +125,15 @@ export declare class CourseController {
         title: string;
         type: import("../../infrastructure/course.schema").ResourceType;
     }>;
-    viewCourse(id: string, req: any, res: any): Promise<any>;
+    viewCourse(id: string, resourceId: string, req: any, res: any): Promise<any>;
+    addResourceToCourse(id: string, resourceData: any, files: {
+        file?: UploadedFile[];
+    }): Promise<import("../../infrastructure/course.schema").CourseDocument>;
+    removeResourceFromCourse(courseId: string, resourceId: string): Promise<import("../../infrastructure/course.schema").CourseDocument>;
+    updateResourcesOrder(id: string, orderData: {
+        resources: {
+            id: string;
+            order: number;
+        }[];
+    }): Promise<import("../../infrastructure/course.schema").CourseDocument>;
 }

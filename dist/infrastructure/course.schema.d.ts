@@ -5,6 +5,15 @@ export declare enum ResourceType {
     VIDEO = "video",
     LINK = "link"
 }
+export declare class CourseResource {
+    id: string;
+    title: string;
+    resourceType: ResourceType;
+    resourceUrl: string;
+    fileName: string;
+    duration: number;
+    order: number;
+}
 export declare class CourseSchema {
     title: string;
     description: string;
@@ -22,6 +31,7 @@ export declare class CourseSchema {
     updatedAt: Date;
     createdBy: MongooseSchema.Types.ObjectId;
     requiredSubscriptionTypes: string[];
+    resources: CourseResource[];
 }
 export type CourseDocument = CourseSchema & Document;
 export declare const CourseModel: MongooseSchema<CourseSchema, import("mongoose").Model<CourseSchema, any, any, any, Document<unknown, any, CourseSchema> & CourseSchema & {

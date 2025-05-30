@@ -158,7 +158,7 @@ let CourseService = class CourseService {
             type: course.resourceType,
         };
     }
-    async getCourseForViewing(id, userType) {
+    async getCourseForViewing(id, resourceId, userType) {
         const course = await this.courseRepository.findById(id);
         if (!course) {
             throw new common_1.NotFoundException('Cours non trouvé');
@@ -172,18 +172,44 @@ let CourseService = class CourseService {
             }
         }
         await this.courseRepository.incrementViewCount(id);
-        let filePath = '';
-        if (course.resourceUrl.startsWith('/uploads/')) {
-            filePath = path.join(process.cwd(), course.resourceUrl.substring(1));
+        let resourceUrl = '';
+        let resourceType = '';
+        let resourceTitle = '';
+        if (resourceId && course.resources && course.resources.length > 0) {
+            const resource = course.resources.find(r => r.id === resourceId);
+            if (!resource) {
+                throw new common_1.NotFoundException('Ressource non trouvée dans ce cours');
+            }
+            resourceUrl = resource.resourceUrl;
+            resourceType = resource.resourceType;
+            resourceTitle = resource.title;
         }
-        else if (course.resourceUrl.startsWith(process.cwd())) {
-            filePath = course.resourceUrl;
+        else if (course.resourceUrl) {
+            resourceUrl = course.resourceUrl;
+            resourceType = course.resourceType;
+            resourceTitle = course.title;
         }
-        else if (course.resourceUrl.startsWith('uploads/')) {
-            filePath = path.join(process.cwd(), course.resourceUrl);
+        else if (course.resources && course.resources.length > 0) {
+            const firstResource = course.resources[0];
+            resourceUrl = firstResource.resourceUrl;
+            resourceType = firstResource.resourceType;
+            resourceTitle = firstResource.title;
         }
         else {
-            console.error('URL non supportée pour la visualisation:', course.resourceUrl);
+            throw new common_1.BadRequestException("Aucune ressource disponible pour ce cours");
+        }
+        let filePath = '';
+        if (resourceUrl.startsWith('/uploads/')) {
+            filePath = path.join(process.cwd(), resourceUrl.substring(1));
+        }
+        else if (resourceUrl.startsWith(process.cwd())) {
+            filePath = resourceUrl;
+        }
+        else if (resourceUrl.startsWith('uploads/')) {
+            filePath = path.join(process.cwd(), resourceUrl);
+        }
+        else {
+            console.error('URL non supportée pour la visualisation:', resourceUrl);
             throw new common_1.BadRequestException("Type d'URL non supporté pour la visualisation");
         }
         try {
@@ -199,8 +225,8 @@ let CourseService = class CourseService {
         }
         return {
             filePath,
-            title: course.title,
-            type: course.resourceType,
+            title: resourceTitle,
+            type: resourceType,
         };
     }
     async canAccessCourse(userId, courseId) {
@@ -225,6 +251,73 @@ let CourseService = class CourseService {
         }
         return false;
     }
+    async addResourceToCourse(courseId, resourceData, file) {
+        const course = await this.courseRepository.findById(courseId);
+        if (!course) {
+            throw new common_1.NotFoundException('Cours non trouvé');
+        }
+        let resourceUrl = resourceData.resourceUrl;
+        if (file) {
+            try {
+                resourceUrl = await this.fileUploadService.saveFile(file);
+                console.log('File saved with path:', resourceUrl);
+            }
+            catch (error) {
+                console.error('Error saving file:', error);
+                throw new common_1.BadRequestException(`Erreur lors de l'upload du fichier: ${error.message}`);
+            }
+        }
+        const newResource = {
+            id: `resource_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+            title: resourceData.title,
+            resourceType: resourceData.resourceType,
+            resourceUrl,
+            fileName: file ? file.originalname : undefined,
+            duration: resourceData.duration || 0,
+            order: resourceData.order || (course.resources ? course.resources.length : 0)
+        };
+        if (!course.resources) {
+            course.resources = [];
+        }
+        course.resources.push(newResource);
+        return this.courseRepository.update(courseId, { resources: course.resources });
+    }
+    async removeResourceFromCourse(courseId, resourceId) {
+        const course = await this.courseRepository.findById(courseId);
+        if (!course) {
+            throw new common_1.NotFoundException('Cours non trouvé');
+        }
+        if (!course.resources || course.resources.length === 0) {
+            throw new common_1.NotFoundException('Ce cours ne contient pas de ressources');
+        }
+        const resourceIndex = course.resources.findIndex(r => r.id === resourceId);
+        if (resourceIndex === -1) {
+            throw new common_1.NotFoundException('Ressource non trouvée dans ce cours');
+        }
+        const resource = course.resources[resourceIndex];
+        if (resource.resourceUrl && resource.resourceUrl.startsWith('/uploads/')) {
+            await this.fileUploadService.removeFile(resource.resourceUrl);
+        }
+        course.resources.splice(resourceIndex, 1);
+        return this.courseRepository.update(courseId, { resources: course.resources });
+    }
+    async updateResourcesOrder(courseId, resourcesOrder) {
+        const course = await this.courseRepository.findById(courseId);
+        if (!course) {
+            throw new common_1.NotFoundException('Cours non trouvé');
+        }
+        if (!course.resources || course.resources.length === 0) {
+            throw new common_1.BadRequestException('Ce cours ne contient pas de ressources');
+        }
+        resourcesOrder.forEach(item => {
+            const resource = course.resources.find(r => r.id === item.id);
+            if (resource) {
+                resource.order = item.order;
+            }
+        });
+        course.resources.sort((a, b) => a.order - b.order);
+        return this.courseRepository.update(courseId, { resources: course.resources });
+    }
     formatCourseResponse(course) {
         return {
             id: course._id,
@@ -242,6 +335,15 @@ let CourseService = class CourseService {
             createdAt: course.createdAt,
             updatedAt: course.updatedAt,
             createdBy: course.createdBy,
+            resources: course.resources ? course.resources.map(resource => ({
+                id: resource._id || resource.id,
+                title: resource.title,
+                resourceType: resource.resourceType,
+                resourceUrl: resource.resourceUrl,
+                fileName: resource.fileName,
+                duration: resource.duration,
+                order: resource.order
+            })).sort((a, b) => a.order - b.order) : []
         };
     }
 };

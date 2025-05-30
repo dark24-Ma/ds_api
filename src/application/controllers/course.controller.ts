@@ -12,6 +12,7 @@ import {
   UseInterceptors,
   Request,
   Response,
+  Query,
   //   ParseFilePipe,
   //   Optional,
   BadRequestException,
@@ -149,29 +150,42 @@ export class CourseController {
   }
 
   @Get(':id/view')
-  async viewCourse(@Param('id') id: string, @Request() req, @Response() res) {
+  async viewCourse(
+    @Param('id') id: string, 
+    @Query('resourceId') resourceId: string,
+    @Request() req, 
+    @Response() res
+  ) {
     try {
       // Vérifier si l'utilisateur est authentifié
       const userType = req.user?.userType || null;
       
       // Obtenir les informations du cours
-      const courseData = await this.courseService.getCourseForViewing(id, userType);
+      const courseData = await this.courseService.getCourseForViewing(id, resourceId, userType);
       
-      // Configurer les en-têtes pour empêcher le téléchargement
-      res.setHeader('Content-Disposition', 'inline');
-      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
-      res.setHeader('X-Content-Type-Options', 'nosniff');
-      
-      // Pour les PDFs, on peut utiliser une protection supplémentaire
+      // Pour les PDFs, utiliser une approche plus compatible avec les navigateurs
       if (courseData.type === 'pdf') {
-        // Stream le fichier PDF avec protection
-        return res.sendFile(courseData.filePath, {
-          headers: {
-            'Content-Type': 'application/pdf',
-          },
+        // Configurer les en-têtes pour limiter les fonctionnalités tout en restant compatible
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'inline; filename="document.pdf"');
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        
+        // Créer un stream de lecture du fichier
+        const fileStream = fs.createReadStream(courseData.filePath);
+        
+        // Gérer les erreurs de stream
+        fileStream.on('error', (error) => {
+          console.error('Erreur de lecture du fichier PDF:', error);
+          if (!res.headersSent) {
+            res.status(404).json({ message: 'Fichier non trouvé' });
+          }
         });
+        
+        // Envoyer le fichier en streaming
+        return fileStream.pipe(res);
       } 
       
       // Pour les vidéos, utiliser le streaming
@@ -214,5 +228,47 @@ export class CourseController {
         message: error.message || 'Erreur lors de la visualisation du cours' 
       });
     }
+  }
+
+  // Ajouter une ressource à un cours
+  @Post(':id/resources')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'file', maxCount: 1 }])
+  )
+  async addResourceToCourse(
+    @Param('id') id: string,
+    @Body() resourceData: any,
+    @UploadedFiles() files: { file?: UploadedFile[] },
+  ) {
+    try {
+      const file = files?.file?.[0];
+      return await this.courseService.addResourceToCourse(id, resourceData, file);
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de la ressource:', error);
+      throw new BadRequestException(
+        `Erreur lors de l'ajout de la ressource: ${error.message}`,
+      );
+    }
+  }
+
+  // Supprimer une ressource d'un cours
+  @Delete(':courseId/resources/:resourceId')
+  @UseGuards(JwtAuthGuard)
+  async removeResourceFromCourse(
+    @Param('courseId') courseId: string,
+    @Param('resourceId') resourceId: string,
+  ) {
+    return this.courseService.removeResourceFromCourse(courseId, resourceId);
+  }
+
+  // Mettre à jour l'ordre des ressources
+  @Put(':id/resources/order')
+  @UseGuards(JwtAuthGuard)
+  async updateResourcesOrder(
+    @Param('id') id: string,
+    @Body() orderData: { resources: { id: string, order: number }[] },
+  ) {
+    return this.courseService.updateResourcesOrder(id, orderData.resources);
   }
 }

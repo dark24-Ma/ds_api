@@ -236,7 +236,7 @@ export class CourseService {
     };
   }
 
-  async getCourseForViewing(id: string, userType: UserType | null) {
+  async getCourseForViewing(id: string, resourceId: string | null, userType: UserType | null) {
     const course = await this.courseRepository.findById(id);
     if (!course) {
       throw new NotFoundException('Cours non trouvé');
@@ -258,25 +258,57 @@ export class CourseService {
     // Incrémenter le compteur de vues
     await this.courseRepository.incrementViewCount(id);
 
+    // Détermine quelle ressource doit être visualisée
+    let resourceUrl = '';
+    let resourceType = '';
+    let resourceTitle = '';
+    
+    // Si on a un ID de ressource spécifique, on cherche cette ressource
+    if (resourceId && course.resources && course.resources.length > 0) {
+      const resource = course.resources.find(r => r.id === resourceId);
+      if (!resource) {
+        throw new NotFoundException('Ressource non trouvée dans ce cours');
+      }
+      resourceUrl = resource.resourceUrl;
+      resourceType = resource.resourceType;
+      resourceTitle = resource.title;
+    } 
+    // Sinon, on utilise la ressource principale du cours ou la première ressource disponible
+    else if (course.resourceUrl) {
+      resourceUrl = course.resourceUrl;
+      resourceType = course.resourceType;
+      resourceTitle = course.title;
+    } 
+    // Si on n'a pas de resourceId mais qu'on a des ressources, on prend la première
+    else if (course.resources && course.resources.length > 0) {
+      const firstResource = course.resources[0];
+      resourceUrl = firstResource.resourceUrl;
+      resourceType = firstResource.resourceType;
+      resourceTitle = firstResource.title;
+    }
+    else {
+      throw new BadRequestException("Aucune ressource disponible pour ce cours");
+    }
+
     // Obtenir le chemin absolu du fichier
     let filePath = '';
     
     // Si l'URL est relative (commence par /uploads/)
-    if (course.resourceUrl.startsWith('/uploads/')) {
-      filePath = path.join(process.cwd(), course.resourceUrl.substring(1));
+    if (resourceUrl.startsWith('/uploads/')) {
+      filePath = path.join(process.cwd(), resourceUrl.substring(1));
     } 
     // Si l'URL est absolue et commence par le répertoire du projet
-    else if (course.resourceUrl.startsWith(process.cwd())) {
-      filePath = course.resourceUrl;
+    else if (resourceUrl.startsWith(process.cwd())) {
+      filePath = resourceUrl;
     }
     // Si l'URL est un chemin relatif mais sans le slash au début
-    else if (course.resourceUrl.startsWith('uploads/')) {
-      filePath = path.join(process.cwd(), course.resourceUrl);
+    else if (resourceUrl.startsWith('uploads/')) {
+      filePath = path.join(process.cwd(), resourceUrl);
     }
     // Gestion des URLs externes (à implémenter si nécessaire)
     else {
       // Pour le moment, on lance une erreur pour les URLs externes
-      console.error('URL non supportée pour la visualisation:', course.resourceUrl);
+      console.error('URL non supportée pour la visualisation:', resourceUrl);
       throw new BadRequestException("Type d'URL non supporté pour la visualisation");
     }
 
@@ -294,8 +326,8 @@ export class CourseService {
 
     return {
       filePath,
-      title: course.title,
-      type: course.resourceType,
+      title: resourceTitle,
+      type: resourceType,
     };
   }
 
@@ -335,6 +367,108 @@ export class CourseService {
     return false;
   }
 
+  // Méthode pour ajouter une ressource à un cours existant
+  async addResourceToCourse(
+    courseId: string, 
+    resourceData: any, 
+    file?: UploadedFile
+  ) {
+    const course = await this.courseRepository.findById(courseId);
+    if (!course) {
+      throw new NotFoundException('Cours non trouvé');
+    }
+
+    let resourceUrl = resourceData.resourceUrl;
+
+    // Si un fichier est fourni, le sauvegarder
+    if (file) {
+      try {
+        resourceUrl = await this.fileUploadService.saveFile(file);
+        console.log('File saved with path:', resourceUrl);
+      } catch (error) {
+        console.error('Error saving file:', error);
+        throw new BadRequestException(`Erreur lors de l'upload du fichier: ${error.message}`);
+      }
+    }
+
+    // Créer la nouvelle ressource avec un ID unique
+    const newResource = {
+      id: `resource_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`, // Générer un ID unique
+      title: resourceData.title,
+      resourceType: resourceData.resourceType,
+      resourceUrl,
+      fileName: file ? file.originalname : undefined,
+      duration: resourceData.duration || 0,
+      order: resourceData.order || (course.resources ? course.resources.length : 0)
+    };
+
+    // Ajouter la ressource au cours
+    if (!course.resources) {
+      course.resources = [];
+    }
+    
+    course.resources.push(newResource);
+
+    // Mettre à jour le cours
+    return this.courseRepository.update(courseId, { resources: course.resources });
+  }
+
+  // Méthode pour supprimer une ressource d'un cours
+  async removeResourceFromCourse(courseId: string, resourceId: string) {
+    const course = await this.courseRepository.findById(courseId);
+    if (!course) {
+      throw new NotFoundException('Cours non trouvé');
+    }
+
+    if (!course.resources || course.resources.length === 0) {
+      throw new NotFoundException('Ce cours ne contient pas de ressources');
+    }
+
+    // Trouver l'index de la ressource à supprimer
+    const resourceIndex = course.resources.findIndex(r => r.id === resourceId);
+    if (resourceIndex === -1) {
+      throw new NotFoundException('Ressource non trouvée dans ce cours');
+    }
+
+    // Supprimer le fichier associé si c'est un fichier uploadé
+    const resource = course.resources[resourceIndex];
+    if (resource.resourceUrl && resource.resourceUrl.startsWith('/uploads/')) {
+      await this.fileUploadService.removeFile(resource.resourceUrl);
+    }
+
+    // Supprimer la ressource du tableau
+    course.resources.splice(resourceIndex, 1);
+
+    // Mettre à jour le cours
+    return this.courseRepository.update(courseId, { resources: course.resources });
+  }
+
+  // Méthode pour mettre à jour l'ordre des ressources
+  async updateResourcesOrder(courseId: string, resourcesOrder: { id: string, order: number }[]) {
+    const course = await this.courseRepository.findById(courseId);
+    if (!course) {
+      throw new NotFoundException('Cours non trouvé');
+    }
+
+    if (!course.resources || course.resources.length === 0) {
+      throw new BadRequestException('Ce cours ne contient pas de ressources');
+    }
+
+    // Mettre à jour l'ordre de chaque ressource
+    resourcesOrder.forEach(item => {
+      const resource = course.resources.find(r => r.id === item.id);
+      if (resource) {
+        resource.order = item.order;
+      }
+    });
+
+    // Trier les ressources selon le nouvel ordre
+    course.resources.sort((a, b) => a.order - b.order);
+
+    // Mettre à jour le cours
+    return this.courseRepository.update(courseId, { resources: course.resources });
+  }
+
   private formatCourseResponse(course) {
     return {
       id: course._id,
@@ -352,6 +486,15 @@ export class CourseService {
       createdAt: course.createdAt,
       updatedAt: course.updatedAt,
       createdBy: course.createdBy,
+      resources: course.resources ? course.resources.map(resource => ({
+        id: resource._id || resource.id,
+        title: resource.title,
+        resourceType: resource.resourceType,
+        resourceUrl: resource.resourceUrl,
+        fileName: resource.fileName,
+        duration: resource.duration,
+        order: resource.order
+      })).sort((a, b) => a.order - b.order) : []
     };
   }
 }

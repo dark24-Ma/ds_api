@@ -34,6 +34,7 @@ export declare class CourseService {
         createdAt: any;
         updatedAt: any;
         createdBy: any;
+        resources: any;
     }>;
     getCourseById(id: string): Promise<{
         id: any;
@@ -51,6 +52,7 @@ export declare class CourseService {
         createdAt: any;
         updatedAt: any;
         createdBy: any;
+        resources: any;
     }>;
     getAllCourses(): Promise<{
         id: any;
@@ -68,6 +70,7 @@ export declare class CourseService {
         createdAt: any;
         updatedAt: any;
         createdBy: any;
+        resources: any;
     }[]>;
     getFreeCourses(): Promise<{
         id: any;
@@ -85,6 +88,7 @@ export declare class CourseService {
         createdAt: any;
         updatedAt: any;
         createdBy: any;
+        resources: any;
     }[]>;
     getCoursesForUserType(userType: UserType): Promise<{
         id: any;
@@ -102,6 +106,7 @@ export declare class CourseService {
         createdAt: any;
         updatedAt: any;
         createdBy: any;
+        resources: any;
     }[]>;
     updateCourse(id: string, updateData: any, file?: UploadedFile, thumbnail?: UploadedFile): Promise<{
         id: any;
@@ -119,6 +124,7 @@ export declare class CourseService {
         createdAt: any;
         updatedAt: any;
         createdBy: any;
+        resources: any;
     }>;
     deleteCourse(id: string): Promise<{
         message: string;
@@ -133,11 +139,17 @@ export declare class CourseService {
         title: string;
         type: import("../../infrastructure/course.schema").ResourceType;
     }>;
-    getCourseForViewing(id: string, userType: UserType | null): Promise<{
+    getCourseForViewing(id: string, resourceId: string | null, userType: UserType | null): Promise<{
         filePath: string;
         title: string;
-        type: import("../../infrastructure/course.schema").ResourceType;
+        type: string;
     }>;
     canAccessCourse(userId: string, courseId: string): Promise<boolean>;
+    addResourceToCourse(courseId: string, resourceData: any, file?: UploadedFile): Promise<import("../../infrastructure/course.schema").CourseDocument>;
+    removeResourceFromCourse(courseId: string, resourceId: string): Promise<import("../../infrastructure/course.schema").CourseDocument>;
+    updateResourcesOrder(courseId: string, resourcesOrder: {
+        id: string;
+        order: number;
+    }[]): Promise<import("../../infrastructure/course.schema").CourseDocument>;
     private formatCourseResponse;
 }
