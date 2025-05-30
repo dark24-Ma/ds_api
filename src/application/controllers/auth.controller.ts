@@ -1,4 +1,11 @@
-import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Post,
+  Put,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 
 @Controller('auth')
@@ -13,6 +20,7 @@ export class AuthController {
       email: string;
       password: string;
       firstname: string;
+      userType: string;
     },
   ) {
     return this.authService.register(
@@ -20,6 +28,7 @@ export class AuthController {
       body.email,
       body.password,
       body.firstname,
+      body.userType,
     );
   }
 
@@ -30,5 +39,19 @@ export class AuthController {
       throw new UnauthorizedException();
     }
     return this.authService.login(user);
+  }
+
+  @Put('reset-password')
+  async resetPassword(@Body() body: { resetToken: string; password: string }) {
+    if (!body.resetToken || !body.password) {
+      // console.log(body.password);
+      throw new BadRequestException('Token et nouveau mot de passe requis');
+    }
+    return this.authService.resetPassowrd(body.resetToken, body.password);
+  }
+
+  @Post('request-reset-password')
+  async requestResetPawwaord(@Body() body: { email: string }) {
+    return this.authService.requestResetPassword(body.email);
   }
 }

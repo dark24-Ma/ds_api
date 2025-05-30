@@ -5,5 +5,9 @@ export class User {
     public email: string,
     public password: string,
     public firstname: string,
+    public resetToken?: string,
+    public resetTokenExpiration?: number,
+    public userType?: string,
+    public phonenumber?: string,
   ) {}
 }
