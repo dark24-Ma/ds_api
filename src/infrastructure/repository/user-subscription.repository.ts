@@ -55,4 +55,14 @@ export class UserSubscriptionRepository {
   async count(): Promise<number> {
     return this.userSubscriptionModel.countDocuments().exec();
   }
+
+  async findActiveByUserId(userId: string): Promise<UserSubscriptionDocument | null> {
+    return this.userSubscriptionModel
+      .findOne({ 
+        userId: userId,
+        isActive: true,
+        endDate: { $gte: new Date() }
+      })
+      .exec();
+  }
 }

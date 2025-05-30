@@ -58,4 +58,10 @@ export class CourseRepository {
       .findByIdAndUpdate(id, { $inc: { downloadCount: 1 } })
       .exec();
   }
+
+  async incrementViewCount(id: string): Promise<void> {
+    await this.courseModel
+      .findByIdAndUpdate(id, { $inc: { viewCount: 1 } })
+      .exec();
+  }
 }

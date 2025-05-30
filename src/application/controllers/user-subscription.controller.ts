@@ -31,4 +31,14 @@ export class UserSubscriptionController {
   async getAllSubscriptions() {
     return this.userSubscriptionService.getAllSubscriptions();
   }
+
+  @Get('check/:userId')
+  async checkUserSubscription(@Param('userId') userId: string) {
+    try {
+      const hasActiveSubscription = await this.userSubscriptionService.hasActiveSubscription(userId);
+      return { hasActiveSubscription };
+    } catch (error) {
+      return { hasActiveSubscription: false, error: error.message };
+    }
+  }
 }

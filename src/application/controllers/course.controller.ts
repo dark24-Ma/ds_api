@@ -11,6 +11,7 @@ import {
   UseGuards,
   UseInterceptors,
   Request,
+  Response,
   //   ParseFilePipe,
   //   Optional,
   BadRequestException,
@@ -23,6 +24,7 @@ import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 // import { ResourceType } from 'src/infrastructure/course.schema';
 import { UserType } from '../../domain/enums/user-type.enum';
 import * as path from 'path';
+import * as fs from 'fs';
 // import { UploadedFile } from '../../types/uploaded-file.interface';
 
 @Controller('courses')
@@ -144,5 +146,73 @@ export class CourseController {
     // Pour les utilisateurs non-authentifiés, utiliser une méthode spéciale pour vérifier
     // si le cours est en accès libre
     return this.courseService.downloadFreeCourse(id);
+  }
+
+  @Get(':id/view')
+  async viewCourse(@Param('id') id: string, @Request() req, @Response() res) {
+    try {
+      // Vérifier si l'utilisateur est authentifié
+      const userType = req.user?.userType || null;
+      
+      // Obtenir les informations du cours
+      const courseData = await this.courseService.getCourseForViewing(id, userType);
+      
+      // Configurer les en-têtes pour empêcher le téléchargement
+      res.setHeader('Content-Disposition', 'inline');
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      
+      // Pour les PDFs, on peut utiliser une protection supplémentaire
+      if (courseData.type === 'pdf') {
+        // Stream le fichier PDF avec protection
+        return res.sendFile(courseData.filePath, {
+          headers: {
+            'Content-Type': 'application/pdf',
+          },
+        });
+      } 
+      
+      // Pour les vidéos, utiliser le streaming
+      if (courseData.type === 'video') {
+        const stat = await fs.promises.stat(courseData.filePath);
+        const fileSize = stat.size;
+        const range = req.headers.range;
+        
+        if (range) {
+          const parts = range.replace(/bytes=/, '').split('-');
+          const start = parseInt(parts[0], 10);
+          const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+          const chunksize = (end - start) + 1;
+          const file = fs.createReadStream(courseData.filePath, { start, end });
+          
+          res.writeHead(206, {
+            'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+            'Accept-Ranges': 'bytes',
+            'Content-Length': chunksize,
+            'Content-Type': 'video/mp4', // Ajuster selon le type de vidéo
+          });
+          
+          return file.pipe(res);
+        } else {
+          res.writeHead(200, {
+            'Content-Length': fileSize,
+            'Content-Type': 'video/mp4', // Ajuster selon le type de vidéo
+          });
+          
+          return fs.createReadStream(courseData.filePath).pipe(res);
+        }
+      }
+      
+      // Cas par défaut
+      return res.status(400).json({ message: "Type de ressource non supporté" });
+      
+    } catch (error) {
+      console.error('Erreur lors de la visualisation du cours:', error);
+      return res.status(error.status || 500).json({ 
+        message: error.message || 'Erreur lors de la visualisation du cours' 
+      });
+    }
   }
 }

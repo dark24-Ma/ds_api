@@ -11,4 +11,5 @@ export declare class UserSubscriptionRepository {
     findAll(): Promise<UserSubscriptionDocument[]>;
     findWithPagination(page?: number, limit?: number): Promise<UserSubscriptionDocument[]>;
     count(): Promise<number>;
+    findActiveByUserId(userId: string): Promise<UserSubscriptionDocument | null>;
 }

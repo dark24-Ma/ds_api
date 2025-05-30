@@ -36,4 +36,5 @@ export declare class UserSubscriptionService {
         subscriptionType: any;
     }[]>;
     private formatUserSubscriptionResponse;
+    hasActiveSubscription(userId: string): Promise<boolean>;
 }

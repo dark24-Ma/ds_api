@@ -119,4 +119,5 @@ export declare class CourseController {
         title: string;
         type: import("../../infrastructure/course.schema").ResourceType;
     }>;
+    viewCourse(id: string, req: any, res: any): Promise<any>;
 }

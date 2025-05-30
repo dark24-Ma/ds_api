@@ -133,6 +133,11 @@ export declare class CourseService {
         title: string;
         type: import("../../infrastructure/course.schema").ResourceType;
     }>;
+    getCourseForViewing(id: string, userType: UserType | null): Promise<{
+        filePath: string;
+        title: string;
+        type: import("../../infrastructure/course.schema").ResourceType;
+    }>;
     canAccessCourse(userId: string, courseId: string): Promise<boolean>;
     private formatCourseResponse;
 }

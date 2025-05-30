@@ -20,6 +20,7 @@ const course_service_1 = require("../services/course.service");
 const jwt_auth_guard_1 = require("../guards/jwt-auth.guard");
 const user_type_enum_1 = require("../../domain/enums/user-type.enum");
 const path = require("path");
+const fs = require("fs");
 let CourseController = class CourseController {
     constructor(courseService) {
         this.courseService = courseService;
@@ -68,6 +69,57 @@ let CourseController = class CourseController {
             return this.courseService.downloadCourse(id, req.user.userType);
         }
         return this.courseService.downloadFreeCourse(id);
+    }
+    async viewCourse(id, req, res) {
+        try {
+            const userType = req.user?.userType || null;
+            const courseData = await this.courseService.getCourseForViewing(id, userType);
+            res.setHeader('Content-Disposition', 'inline');
+            res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+            res.setHeader('Pragma', 'no-cache');
+            res.setHeader('Expires', '0');
+            res.setHeader('X-Content-Type-Options', 'nosniff');
+            if (courseData.type === 'pdf') {
+                return res.sendFile(courseData.filePath, {
+                    headers: {
+                        'Content-Type': 'application/pdf',
+                    },
+                });
+            }
+            if (courseData.type === 'video') {
+                const stat = await fs.promises.stat(courseData.filePath);
+                const fileSize = stat.size;
+                const range = req.headers.range;
+                if (range) {
+                    const parts = range.replace(/bytes=/, '').split('-');
+                    const start = parseInt(parts[0], 10);
+                    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+                    const chunksize = (end - start) + 1;
+                    const file = fs.createReadStream(courseData.filePath, { start, end });
+                    res.writeHead(206, {
+                        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+                        'Accept-Ranges': 'bytes',
+                        'Content-Length': chunksize,
+                        'Content-Type': 'video/mp4',
+                    });
+                    return file.pipe(res);
+                }
+                else {
+                    res.writeHead(200, {
+                        'Content-Length': fileSize,
+                        'Content-Type': 'video/mp4',
+                    });
+                    return fs.createReadStream(courseData.filePath).pipe(res);
+                }
+            }
+            return res.status(400).json({ message: "Type de ressource non supporté" });
+        }
+        catch (error) {
+            console.error('Erreur lors de la visualisation du cours:', error);
+            return res.status(error.status || 500).json({
+                message: error.message || 'Erreur lors de la visualisation du cours'
+            });
+        }
     }
 };
 exports.CourseController = CourseController;
@@ -150,6 +202,15 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], CourseController.prototype, "downloadCourse", null);
+__decorate([
+    (0, common_1.Get)(':id/view'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Request)()),
+    __param(2, (0, common_1.Response)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], CourseController.prototype, "viewCourse", null);
 exports.CourseController = CourseController = __decorate([
     (0, common_1.Controller)('courses'),
     __metadata("design:paramtypes", [course_service_1.CourseService])

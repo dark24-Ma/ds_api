@@ -17,6 +17,7 @@ export declare class CourseSchema {
     isFeatured: boolean;
     isFreeAccess: boolean;
     downloadCount: number;
+    viewCount: number;
     createdAt: Date;
     updatedAt: Date;
     createdBy: MongooseSchema.Types.ObjectId;

@@ -79,6 +79,20 @@ let UserSubscriptionService = class UserSubscriptionService {
             updatedAt: userSubscription.updatedAt,
         };
     }
+    async hasActiveSubscription(userId) {
+        try {
+            const subscription = await this.userSubscriptionRepository.findActiveByUserId(userId);
+            if (!subscription) {
+                return false;
+            }
+            const isActive = subscription.isActive && new Date() <= subscription.endDate;
+            return isActive;
+        }
+        catch (error) {
+            console.error(`Erreur lors de la vérification de l'abonnement pour l'utilisateur ${userId}:`, error);
+            return false;
+        }
+    }
 };
 exports.UserSubscriptionService = UserSubscriptionService;
 exports.UserSubscriptionService = UserSubscriptionService = __decorate([

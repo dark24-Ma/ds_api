@@ -50,6 +50,15 @@ let UserSubscriptionRepository = class UserSubscriptionRepository {
     async count() {
         return this.userSubscriptionModel.countDocuments().exec();
     }
+    async findActiveByUserId(userId) {
+        return this.userSubscriptionModel
+            .findOne({
+            userId: userId,
+            isActive: true,
+            endDate: { $gte: new Date() }
+        })
+            .exec();
+    }
 };
 exports.UserSubscriptionRepository = UserSubscriptionRepository;
 exports.UserSubscriptionRepository = UserSubscriptionRepository = __decorate([

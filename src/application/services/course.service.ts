@@ -11,6 +11,7 @@ import { UserSubscriptionService } from './user-subscription.service';
 // import { ResourceType } from 'src/domain/enums/course.enum';
 import { UserType } from '../../domain/enums/user-type.enum';
 // import { UploadedFile } from '../../types/uploaded-file.interface';
+import * as path from 'path';
 
 export interface UploadedFile {
   // Propriétés du buffer (memory storage)
@@ -230,6 +231,69 @@ export class CourseService {
 
     return {
       url: course.resourceUrl,
+      title: course.title,
+      type: course.resourceType,
+    };
+  }
+
+  async getCourseForViewing(id: string, userType: UserType | null) {
+    const course = await this.courseRepository.findById(id);
+    if (!course) {
+      throw new NotFoundException('Cours non trouvé');
+    }
+
+    // Vérifier si l'utilisateur a accès au cours
+    if (!course.isFreeAccess) {
+      // Si le cours n'est pas en accès libre, vérifier si l'utilisateur est authentifié
+      if (!userType) {
+        throw new ForbiddenException("Vous devez être connecté pour accéder à ce cours");
+      }
+
+      // Vérifier si l'utilisateur a le type requis pour accéder au cours
+      if (course.accessibleTo.length > 0 && !course.accessibleTo.includes(userType)) {
+        throw new ForbiddenException("Vous n'avez pas accès à ce cours");
+      }
+    }
+
+    // Incrémenter le compteur de vues
+    await this.courseRepository.incrementViewCount(id);
+
+    // Obtenir le chemin absolu du fichier
+    let filePath = '';
+    
+    // Si l'URL est relative (commence par /uploads/)
+    if (course.resourceUrl.startsWith('/uploads/')) {
+      filePath = path.join(process.cwd(), course.resourceUrl.substring(1));
+    } 
+    // Si l'URL est absolue et commence par le répertoire du projet
+    else if (course.resourceUrl.startsWith(process.cwd())) {
+      filePath = course.resourceUrl;
+    }
+    // Si l'URL est un chemin relatif mais sans le slash au début
+    else if (course.resourceUrl.startsWith('uploads/')) {
+      filePath = path.join(process.cwd(), course.resourceUrl);
+    }
+    // Gestion des URLs externes (à implémenter si nécessaire)
+    else {
+      // Pour le moment, on lance une erreur pour les URLs externes
+      console.error('URL non supportée pour la visualisation:', course.resourceUrl);
+      throw new BadRequestException("Type d'URL non supporté pour la visualisation");
+    }
+
+    // Vérifier si le fichier existe
+    try {
+      const fs = require('fs');
+      if (!fs.existsSync(filePath)) {
+        console.error('Fichier non trouvé:', filePath);
+        throw new NotFoundException('Fichier du cours non trouvé');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la vérification du fichier:', error);
+      throw new NotFoundException('Fichier du cours non trouvé ou inaccessible');
+    }
+
+    return {
+      filePath,
       title: course.title,
       type: course.resourceType,
     };

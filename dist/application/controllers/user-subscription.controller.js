@@ -29,6 +29,15 @@ let UserSubscriptionController = class UserSubscriptionController {
     async getAllSubscriptions() {
         return this.userSubscriptionService.getAllSubscriptions();
     }
+    async checkUserSubscription(userId) {
+        try {
+            const hasActiveSubscription = await this.userSubscriptionService.hasActiveSubscription(userId);
+            return { hasActiveSubscription };
+        }
+        catch (error) {
+            return { hasActiveSubscription: false, error: error.message };
+        }
+    }
 };
 exports.UserSubscriptionController = UserSubscriptionController;
 __decorate([
@@ -51,6 +60,13 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], UserSubscriptionController.prototype, "getAllSubscriptions", null);
+__decorate([
+    (0, common_1.Get)('check/:userId'),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserSubscriptionController.prototype, "checkUserSubscription", null);
 exports.UserSubscriptionController = UserSubscriptionController = __decorate([
     (0, common_1.Controller)('user-subscriptions'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

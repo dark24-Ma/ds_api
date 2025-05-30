@@ -14,6 +14,7 @@ const common_1 = require("@nestjs/common");
 const course_repository_1 = require("../../infrastructure/repository/course.repository");
 const file_upload_service_1 = require("./file-upload.service");
 const user_subscription_service_1 = require("./user-subscription.service");
+const path = require("path");
 let CourseService = class CourseService {
     constructor(courseRepository, fileUploadService, userSubscriptionService) {
         this.courseRepository = courseRepository;
@@ -153,6 +154,51 @@ let CourseService = class CourseService {
         await this.courseRepository.incrementDownloadCount(id);
         return {
             url: course.resourceUrl,
+            title: course.title,
+            type: course.resourceType,
+        };
+    }
+    async getCourseForViewing(id, userType) {
+        const course = await this.courseRepository.findById(id);
+        if (!course) {
+            throw new common_1.NotFoundException('Cours non trouvé');
+        }
+        if (!course.isFreeAccess) {
+            if (!userType) {
+                throw new common_1.ForbiddenException("Vous devez être connecté pour accéder à ce cours");
+            }
+            if (course.accessibleTo.length > 0 && !course.accessibleTo.includes(userType)) {
+                throw new common_1.ForbiddenException("Vous n'avez pas accès à ce cours");
+            }
+        }
+        await this.courseRepository.incrementViewCount(id);
+        let filePath = '';
+        if (course.resourceUrl.startsWith('/uploads/')) {
+            filePath = path.join(process.cwd(), course.resourceUrl.substring(1));
+        }
+        else if (course.resourceUrl.startsWith(process.cwd())) {
+            filePath = course.resourceUrl;
+        }
+        else if (course.resourceUrl.startsWith('uploads/')) {
+            filePath = path.join(process.cwd(), course.resourceUrl);
+        }
+        else {
+            console.error('URL non supportée pour la visualisation:', course.resourceUrl);
+            throw new common_1.BadRequestException("Type d'URL non supporté pour la visualisation");
+        }
+        try {
+            const fs = require('fs');
+            if (!fs.existsSync(filePath)) {
+                console.error('Fichier non trouvé:', filePath);
+                throw new common_1.NotFoundException('Fichier du cours non trouvé');
+            }
+        }
+        catch (error) {
+            console.error('Erreur lors de la vérification du fichier:', error);
+            throw new common_1.NotFoundException('Fichier du cours non trouvé ou inaccessible');
+        }
+        return {
+            filePath,
             title: course.title,
             type: course.resourceType,
         };

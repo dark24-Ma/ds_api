@@ -36,4 +36,11 @@ export declare class UserSubscriptionController {
         updatedAt: Date;
         subscriptionType: any;
     }[]>;
+    checkUserSubscription(userId: string): Promise<{
+        hasActiveSubscription: boolean;
+        error?: undefined;
+    } | {
+        hasActiveSubscription: boolean;
+        error: any;
+    }>;
 }

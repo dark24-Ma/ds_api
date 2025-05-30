@@ -97,4 +97,23 @@ export class UserSubscriptionService {
       updatedAt: userSubscription.updatedAt,
     };
   }
+
+  async hasActiveSubscription(userId: string): Promise<boolean> {
+    try {
+      const subscription = await this.userSubscriptionRepository.findActiveByUserId(userId);
+      
+      // Si aucun abonnement n'est trouvé
+      if (!subscription) {
+        return false;
+      }
+      
+      // Vérifier si l'abonnement est actif et non expiré
+      const isActive = subscription.isActive && new Date() <= subscription.endDate;
+      
+      return isActive;
+    } catch (error) {
+      console.error(`Erreur lors de la vérification de l'abonnement pour l'utilisateur ${userId}:`, error);
+      return false;
+    }
+  }
 }

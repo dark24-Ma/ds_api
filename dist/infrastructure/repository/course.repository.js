@@ -55,6 +55,11 @@ let CourseRepository = class CourseRepository {
             .findByIdAndUpdate(id, { $inc: { downloadCount: 1 } })
             .exec();
     }
+    async incrementViewCount(id) {
+        await this.courseModel
+            .findByIdAndUpdate(id, { $inc: { viewCount: 1 } })
+            .exec();
+    }
 };
 exports.CourseRepository = CourseRepository;
 exports.CourseRepository = CourseRepository = __decorate([

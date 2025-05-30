@@ -44,6 +44,9 @@ export class CourseSchema {
 
   @Prop({ default: 0 })
   downloadCount: number;
+  
+  @Prop({ default: 0 })
+  viewCount: number; // Nombre de fois que le cours a été visualisé
 
   @Prop({ default: Date.now })
   createdAt: Date;

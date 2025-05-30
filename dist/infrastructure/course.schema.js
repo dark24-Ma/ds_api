@@ -66,6 +66,10 @@ __decorate([
     __metadata("design:type", Number)
 ], CourseSchema.prototype, "downloadCount", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({ default: 0 }),
+    __metadata("design:type", Number)
+], CourseSchema.prototype, "viewCount", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ default: Date.now }),
     __metadata("design:type", Date)
 ], CourseSchema.prototype, "createdAt", void 0);

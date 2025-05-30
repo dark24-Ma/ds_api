@@ -12,4 +12,5 @@ export declare class CourseRepository {
     update(id: string, updateData: any): Promise<CourseDocument | null>;
     delete(id: string): Promise<CourseDocument | null>;
     incrementDownloadCount(id: string): Promise<void>;
+    incrementViewCount(id: string): Promise<void>;
 }
