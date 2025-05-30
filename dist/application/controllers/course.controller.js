@@ -48,6 +48,9 @@ let CourseController = class CourseController {
     async getAllCourses() {
         return this.courseService.getAllCourses();
     }
+    async getFreeCourses() {
+        return this.courseService.getFreeCourses();
+    }
     async getCoursesByUserType(userType) {
         return this.courseService.getCoursesForUserType(userType);
     }
@@ -61,7 +64,10 @@ let CourseController = class CourseController {
         return this.courseService.deleteCourse(id);
     }
     async downloadCourse(id, req) {
-        return this.courseService.downloadCourse(id, req.user.userType);
+        if (req.user && req.user.userType) {
+            return this.courseService.downloadCourse(id, req.user.userType);
+        }
+        return this.courseService.downloadFreeCourse(id);
     }
 };
 exports.CourseController = CourseController;
@@ -94,6 +100,12 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], CourseController.prototype, "getAllCourses", null);
+__decorate([
+    (0, common_1.Get)('free-access'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], CourseController.prototype, "getFreeCourses", null);
 __decorate([
     (0, common_1.Get)('type/:userType'),
     __param(0, (0, common_1.Param)('userType')),
@@ -132,7 +144,6 @@ __decorate([
 ], CourseController.prototype, "deleteCourse", null);
 __decorate([
     (0, common_1.Get)(':id/download'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),

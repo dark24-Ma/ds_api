@@ -70,6 +70,10 @@ let CourseService = class CourseService {
         const courses = await this.courseRepository.findAll();
         return courses.map((course) => this.formatCourseResponse(course));
     }
+    async getFreeCourses() {
+        const courses = await this.courseRepository.findByFreeAccess();
+        return courses.map((course) => this.formatCourseResponse(course));
+    }
     async getCoursesForUserType(userType) {
         const courses = await this.courseRepository.findByUserType(userType);
         return courses.map((course) => this.formatCourseResponse(course));
@@ -119,9 +123,32 @@ let CourseService = class CourseService {
         if (!course) {
             throw new common_1.NotFoundException('Cours non trouvé');
         }
+        if (course.isFreeAccess) {
+            await this.courseRepository.incrementDownloadCount(id);
+            return {
+                url: course.resourceUrl,
+                title: course.title,
+                type: course.resourceType,
+            };
+        }
         if (course.accessibleTo.length > 0 &&
             !course.accessibleTo.includes(userType)) {
             throw new common_1.ForbiddenException("Vous n'avez pas accès à ce cours");
+        }
+        await this.courseRepository.incrementDownloadCount(id);
+        return {
+            url: course.resourceUrl,
+            title: course.title,
+            type: course.resourceType,
+        };
+    }
+    async downloadFreeCourse(id) {
+        const course = await this.courseRepository.findById(id);
+        if (!course) {
+            throw new common_1.NotFoundException('Cours non trouvé');
+        }
+        if (!course.isFreeAccess) {
+            throw new common_1.ForbiddenException("Ce cours n'est pas en accès libre, veuillez vous connecter");
         }
         await this.courseRepository.incrementDownloadCount(id);
         return {
@@ -134,6 +161,9 @@ let CourseService = class CourseService {
         const course = await this.courseRepository.findById(courseId);
         if (!course) {
             throw new common_1.NotFoundException('Cours non trouvé');
+        }
+        if (course.isFreeAccess) {
+            return true;
         }
         if (course.requiredSubscriptionTypes.length === 0) {
             return true;
@@ -161,6 +191,7 @@ let CourseService = class CourseService {
             duration: course.duration,
             accessibleTo: course.accessibleTo,
             isFeatured: course.isFeatured,
+            isFreeAccess: course.isFreeAccess,
             downloadCount: course.downloadCount,
             createdAt: course.createdAt,
             updatedAt: course.updatedAt,

@@ -7,6 +7,7 @@ export declare class CourseRepository {
     create(courseData: any): Promise<CourseDocument>;
     findById(id: string): Promise<CourseDocument | null>;
     findAll(): Promise<CourseDocument[]>;
+    findByFreeAccess(): Promise<CourseDocument[]>;
     findByUserType(userType: UserType): Promise<CourseDocument[]>;
     update(id: string, updateData: any): Promise<CourseDocument | null>;
     delete(id: string): Promise<CourseDocument | null>;

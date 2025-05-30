@@ -30,6 +30,12 @@ let CourseRepository = class CourseRepository {
     async findAll() {
         return this.courseModel.find().sort({ createdAt: -1 }).exec();
     }
+    async findByFreeAccess() {
+        return this.courseModel
+            .find({ isFreeAccess: true })
+            .sort({ createdAt: -1 })
+            .exec();
+    }
     async findByUserType(userType) {
         return this.courseModel
             .find({ accessibleTo: userType })

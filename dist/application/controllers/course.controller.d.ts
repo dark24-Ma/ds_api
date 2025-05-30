@@ -17,6 +17,7 @@ export declare class CourseController {
         duration: any;
         accessibleTo: any;
         isFeatured: any;
+        isFreeAccess: any;
         downloadCount: any;
         createdAt: any;
         updatedAt: any;
@@ -33,6 +34,24 @@ export declare class CourseController {
         duration: any;
         accessibleTo: any;
         isFeatured: any;
+        isFreeAccess: any;
+        downloadCount: any;
+        createdAt: any;
+        updatedAt: any;
+        createdBy: any;
+    }[]>;
+    getFreeCourses(): Promise<{
+        id: any;
+        title: any;
+        description: any;
+        tags: any;
+        resourceType: any;
+        resourceUrl: any;
+        thumbnailUrl: any;
+        duration: any;
+        accessibleTo: any;
+        isFeatured: any;
+        isFreeAccess: any;
         downloadCount: any;
         createdAt: any;
         updatedAt: any;
@@ -49,6 +68,7 @@ export declare class CourseController {
         duration: any;
         accessibleTo: any;
         isFeatured: any;
+        isFreeAccess: any;
         downloadCount: any;
         createdAt: any;
         updatedAt: any;
@@ -65,6 +85,7 @@ export declare class CourseController {
         duration: any;
         accessibleTo: any;
         isFeatured: any;
+        isFreeAccess: any;
         downloadCount: any;
         createdAt: any;
         updatedAt: any;
@@ -84,6 +105,7 @@ export declare class CourseController {
         duration: any;
         accessibleTo: any;
         isFeatured: any;
+        isFreeAccess: any;
         downloadCount: any;
         createdAt: any;
         updatedAt: any;

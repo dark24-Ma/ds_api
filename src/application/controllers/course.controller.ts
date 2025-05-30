@@ -91,6 +91,11 @@ export class CourseController {
     return this.courseService.getAllCourses();
   }
 
+  @Get('free-access')
+  async getFreeCourses() {
+    return this.courseService.getFreeCourses();
+  }
+
   @Get('type/:userType')
   async getCoursesByUserType(@Param('userType') userType: UserType) {
     return this.courseService.getCoursesForUserType(userType);
@@ -130,8 +135,14 @@ export class CourseController {
   }
 
   @Get(':id/download')
-  @UseGuards(JwtAuthGuard)
   async downloadCourse(@Param('id') id: string, @Request() req) {
-    return this.courseService.downloadCourse(id, req.user.userType);
+    // Si l'utilisateur est authentifié, utiliser son type d'utilisateur
+    if (req.user && req.user.userType) {
+      return this.courseService.downloadCourse(id, req.user.userType);
+    }
+    
+    // Pour les utilisateurs non-authentifiés, utiliser une méthode spéciale pour vérifier
+    // si le cours est en accès libre
+    return this.courseService.downloadFreeCourse(id);
   }
 }

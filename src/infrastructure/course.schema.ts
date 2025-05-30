@@ -39,6 +39,9 @@ export class CourseSchema {
   @Prop({ default: false })
   isFeatured: boolean;
 
+  @Prop({ default: false })
+  isFreeAccess: boolean; // Indique si le cours est accessible sans abonnement
+
   @Prop({ default: 0 })
   downloadCount: number;
 

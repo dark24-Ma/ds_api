@@ -15,6 +15,7 @@ export declare class CourseSchema {
     duration: number;
     accessibleTo: UserType[];
     isFeatured: boolean;
+    isFreeAccess: boolean;
     downloadCount: number;
     createdAt: Date;
     updatedAt: Date;

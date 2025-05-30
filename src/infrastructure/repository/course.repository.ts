@@ -25,6 +25,13 @@ export class CourseRepository {
     return this.courseModel.find().sort({ createdAt: -1 }).exec();
   }
 
+  async findByFreeAccess(): Promise<CourseDocument[]> {
+    return this.courseModel
+      .find({ isFreeAccess: true })
+      .sort({ createdAt: -1 })
+      .exec();
+  }
+
   async findByUserType(userType: UserType): Promise<CourseDocument[]> {
     return this.courseModel
       .find({ accessibleTo: userType })

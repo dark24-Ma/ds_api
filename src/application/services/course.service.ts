@@ -108,6 +108,11 @@ export class CourseService {
     return courses.map((course) => this.formatCourseResponse(course));
   }
 
+  async getFreeCourses() {
+    const courses = await this.courseRepository.findByFreeAccess();
+    return courses.map((course) => this.formatCourseResponse(course));
+  }
+
   async getCoursesForUserType(userType: UserType) {
     const courses = await this.courseRepository.findByUserType(userType);
     return courses.map((course) => this.formatCourseResponse(course));
@@ -179,6 +184,18 @@ export class CourseService {
       throw new NotFoundException('Cours non trouvé');
     }
 
+    // Si le cours est en accès libre, autoriser le téléchargement
+    if (course.isFreeAccess) {
+      // Incrémenter le compteur de téléchargements
+      await this.courseRepository.incrementDownloadCount(id);
+      
+      return {
+        url: course.resourceUrl,
+        title: course.title,
+        type: course.resourceType,
+      };
+    }
+
     // Vérifier si l'utilisateur a accès au cours
     if (
       course.accessibleTo.length > 0 &&
@@ -197,10 +214,36 @@ export class CourseService {
     };
   }
 
+  async downloadFreeCourse(id: string) {
+    const course = await this.courseRepository.findById(id);
+    if (!course) {
+      throw new NotFoundException('Cours non trouvé');
+    }
+
+    // Vérifier si le cours est en accès libre
+    if (!course.isFreeAccess) {
+      throw new ForbiddenException("Ce cours n'est pas en accès libre, veuillez vous connecter");
+    }
+
+    // Incrémenter le compteur de téléchargements
+    await this.courseRepository.incrementDownloadCount(id);
+
+    return {
+      url: course.resourceUrl,
+      title: course.title,
+      type: course.resourceType,
+    };
+  }
+
   async canAccessCourse(userId: string, courseId: string): Promise<boolean> {
     const course = await this.courseRepository.findById(courseId);
     if (!course) {
       throw new NotFoundException('Cours non trouvé');
+    }
+
+    // Si le cours est en accès libre, accès autorisé pour tous
+    if (course.isFreeAccess) {
+      return true;
     }
 
     // Si le cours n'a pas de restrictions d'abonnement
@@ -240,6 +283,7 @@ export class CourseService {
       duration: course.duration,
       accessibleTo: course.accessibleTo,
       isFeatured: course.isFeatured,
+      isFreeAccess: course.isFreeAccess,
       downloadCount: course.downloadCount,
       createdAt: course.createdAt,
       updatedAt: course.updatedAt,

@@ -29,6 +29,7 @@ export declare class CourseService {
         duration: any;
         accessibleTo: any;
         isFeatured: any;
+        isFreeAccess: any;
         downloadCount: any;
         createdAt: any;
         updatedAt: any;
@@ -45,6 +46,7 @@ export declare class CourseService {
         duration: any;
         accessibleTo: any;
         isFeatured: any;
+        isFreeAccess: any;
         downloadCount: any;
         createdAt: any;
         updatedAt: any;
@@ -61,6 +63,24 @@ export declare class CourseService {
         duration: any;
         accessibleTo: any;
         isFeatured: any;
+        isFreeAccess: any;
+        downloadCount: any;
+        createdAt: any;
+        updatedAt: any;
+        createdBy: any;
+    }[]>;
+    getFreeCourses(): Promise<{
+        id: any;
+        title: any;
+        description: any;
+        tags: any;
+        resourceType: any;
+        resourceUrl: any;
+        thumbnailUrl: any;
+        duration: any;
+        accessibleTo: any;
+        isFeatured: any;
+        isFreeAccess: any;
         downloadCount: any;
         createdAt: any;
         updatedAt: any;
@@ -77,6 +97,7 @@ export declare class CourseService {
         duration: any;
         accessibleTo: any;
         isFeatured: any;
+        isFreeAccess: any;
         downloadCount: any;
         createdAt: any;
         updatedAt: any;
@@ -93,6 +114,7 @@ export declare class CourseService {
         duration: any;
         accessibleTo: any;
         isFeatured: any;
+        isFreeAccess: any;
         downloadCount: any;
         createdAt: any;
         updatedAt: any;
@@ -102,6 +124,11 @@ export declare class CourseService {
         message: string;
     }>;
     downloadCourse(id: string, userType: UserType): Promise<{
+        url: string;
+        title: string;
+        type: import("../../infrastructure/course.schema").ResourceType;
+    }>;
+    downloadFreeCourse(id: string): Promise<{
         url: string;
         title: string;
         type: import("../../infrastructure/course.schema").ResourceType;
