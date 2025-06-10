@@ -8,6 +8,7 @@ export declare class SubscriptionTypeController {
         description: any;
         price: any;
         duration: any;
+        level: any;
         features: any;
         createdAt: any;
         updatedAt: any;
@@ -18,6 +19,7 @@ export declare class SubscriptionTypeController {
         description: any;
         price: any;
         duration: any;
+        level: any;
         features: any;
         createdAt: any;
         updatedAt: any;
@@ -28,6 +30,7 @@ export declare class SubscriptionTypeController {
         description: any;
         price: any;
         duration: any;
+        level: any;
         features: any;
         createdAt: any;
         updatedAt: any;
@@ -38,6 +41,7 @@ export declare class SubscriptionTypeController {
         description: any;
         price: any;
         duration: any;
+        level: any;
         features: any;
         createdAt: any;
         updatedAt: any;

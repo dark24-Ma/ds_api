@@ -5,6 +5,7 @@ export declare class SubscriptionTypeSchema {
     price: number;
     duration: number;
     features: string[];
+    level: number;
     createdAt: Date;
     updatedAt: Date;
 }

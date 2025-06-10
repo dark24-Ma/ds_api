@@ -367,6 +367,73 @@ export class CourseService {
     return false;
   }
 
+  /**
+   * Récupérer les cours accessibles à un utilisateur selon son abonnement
+   */
+  async getCoursesForUser(userId: string) {
+    // Récupérer tous les cours
+    const allCourses = await this.courseRepository.findAll();
+    
+    // Récupérer l'abonnement de l'utilisateur
+    let userSubscription = null;
+    try {
+      userSubscription = await this.userSubscriptionService.getUserSubscription(userId);
+    } catch (error) {
+      // L'utilisateur n'a pas d'abonnement, il n'aura accès qu'aux cours gratuits
+    }
+
+    const accessibleCourses = [];
+
+    for (const course of allCourses) {
+      // Cours gratuits - accessibles à tous
+      if (course.isFreeAccess) {
+        accessibleCourses.push({
+          ...this.formatCourseResponse(course),
+          accessType: 'free',
+          hasAccess: true
+        });
+        continue;
+      }
+
+      // Cours sans restrictions d'abonnement - accessibles à tous
+      if (course.requiredSubscriptionTypes.length === 0) {
+        accessibleCourses.push({
+          ...this.formatCourseResponse(course),
+          accessType: 'unrestricted',
+          hasAccess: true
+        });
+        continue;
+      }
+
+      // Cours premium - vérifier l'abonnement
+      let hasAccess = false;
+      if (userSubscription && 
+          userSubscription.isActive && 
+          new Date() <= userSubscription.endDate) {
+        hasAccess = course.requiredSubscriptionTypes.includes(
+          userSubscription.subscriptionTypeId
+        );
+      }
+
+      accessibleCourses.push({
+        ...this.formatCourseResponse(course),
+        accessType: 'premium',
+        hasAccess,
+        requiredSubscriptionTypes: course.requiredSubscriptionTypes
+      });
+    }
+
+    return {
+      courses: accessibleCourses,
+      userSubscription: userSubscription ? {
+        subscriptionType: userSubscription.subscriptionType?.name,
+        subscriptionTypeId: userSubscription.subscriptionTypeId,
+        isActive: userSubscription.isActive,
+        endDate: userSubscription.endDate
+      } : null
+    };
+  }
+
   // Méthode pour ajouter une ressource à un cours existant
   async addResourceToCourse(
     courseId: string, 

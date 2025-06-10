@@ -26,6 +26,9 @@ let UserSubscriptionController = class UserSubscriptionController {
     async getUserSubscription(userId) {
         return this.userSubscriptionService.getUserSubscription(userId);
     }
+    async getUserSubscriptionWithDetails(userId) {
+        return this.userSubscriptionService.getUserSubscriptionWithDetails(userId);
+    }
     async getAllSubscriptions() {
         return this.userSubscriptionService.getAllSubscriptions();
     }
@@ -37,6 +40,30 @@ let UserSubscriptionController = class UserSubscriptionController {
         catch (error) {
             return { hasActiveSubscription: false, error: error.message };
         }
+    }
+    async cancelSubscription(subscriptionId) {
+        return this.userSubscriptionService.cancelSubscription(subscriptionId);
+    }
+    async expireSubscription(subscriptionId) {
+        return this.userSubscriptionService.expireSubscription(subscriptionId);
+    }
+    async checkAndUpdateExpiredSubscriptions() {
+        return this.userSubscriptionService.checkAndUpdateExpiredSubscriptions();
+    }
+    async renewSubscription(body) {
+        return this.userSubscriptionService.renewSubscription(body.userId, body.subscriptionTypeId);
+    }
+    async extendSubscription(body) {
+        return this.userSubscriptionService.extendSubscription(body.userId, body.additionalDays || 30);
+    }
+    async upgradeSubscription(body) {
+        return this.userSubscriptionService.upgradeSubscription(body.userId, body.newSubscriptionTypeId);
+    }
+    async getSubscriptionSuggestions(userId, requestedTypeId) {
+        return this.userSubscriptionService.getSubscriptionSuggestions(userId, requestedTypeId);
+    }
+    async getUserSubscriptionHistory(userId) {
+        return this.userSubscriptionService.getUserSubscriptionHistory(userId);
     }
 };
 exports.UserSubscriptionController = UserSubscriptionController;
@@ -55,6 +82,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserSubscriptionController.prototype, "getUserSubscription", null);
 __decorate([
+    (0, common_1.Get)('details/:userId'),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserSubscriptionController.prototype, "getUserSubscriptionWithDetails", null);
+__decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
@@ -67,6 +101,62 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UserSubscriptionController.prototype, "checkUserSubscription", null);
+__decorate([
+    (0, common_1.Put)('cancel/:subscriptionId'),
+    __param(0, (0, common_1.Param)('subscriptionId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserSubscriptionController.prototype, "cancelSubscription", null);
+__decorate([
+    (0, common_1.Put)('expire/:subscriptionId'),
+    __param(0, (0, common_1.Param)('subscriptionId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserSubscriptionController.prototype, "expireSubscription", null);
+__decorate([
+    (0, common_1.Post)('check-expired'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], UserSubscriptionController.prototype, "checkAndUpdateExpiredSubscriptions", null);
+__decorate([
+    (0, common_1.Post)('renew'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserSubscriptionController.prototype, "renewSubscription", null);
+__decorate([
+    (0, common_1.Post)('extend'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserSubscriptionController.prototype, "extendSubscription", null);
+__decorate([
+    (0, common_1.Post)('upgrade'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserSubscriptionController.prototype, "upgradeSubscription", null);
+__decorate([
+    (0, common_1.Get)('suggestions/:userId/:requestedTypeId'),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Param)('requestedTypeId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], UserSubscriptionController.prototype, "getSubscriptionSuggestions", null);
+__decorate([
+    (0, common_1.Get)('history/:userId'),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserSubscriptionController.prototype, "getUserSubscriptionHistory", null);
 exports.UserSubscriptionController = UserSubscriptionController = __decorate([
     (0, common_1.Controller)('user-subscriptions'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

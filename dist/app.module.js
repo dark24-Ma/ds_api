@@ -49,6 +49,10 @@ const user_subscription_repository_1 = require("./infrastructure/repository/user
 const subscription_type_schema_1 = require("./infrastructure/subscription-type.schema");
 const user_subscription_schema_1 = require("./infrastructure/user-subscription.schema");
 const subscription_type_controller_1 = require("./application/controllers/subscription-type.controller");
+const payment_controller_1 = require("./application/controllers/payment.controller");
+const paygate_service_1 = require("./application/services/paygate.service");
+const subscription_payment_service_1 = require("./application/services/subscription-payment.service");
+const config_1 = require("@nestjs/config");
 dotenv.config();
 let AppModule = class AppModule {
 };
@@ -56,6 +60,9 @@ exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
+            }),
             mongoose_1.MongooseModule.forRoot(process.env.MONGODB_URI),
             mongoose_1.MongooseModule.forFeature([
                 { name: 'User', schema: user_schema_1.userModel },
@@ -95,6 +102,7 @@ exports.AppModule = AppModule = __decorate([
             course_sender_controller_1.CourseSenderController,
             subscription_type_controller_1.SubscriptionTypeController,
             user_subscription_controller_1.UserSubscriptionController,
+            payment_controller_1.PaymentController,
         ],
         providers: [
             user_repository_1.UserRepository,
@@ -117,6 +125,8 @@ exports.AppModule = AppModule = __decorate([
             user_subscription_service_1.UserSubscriptionService,
             subscription_type_repository_1.SubscriptionTypeRepository,
             user_subscription_repository_1.UserSubscriptionRepository,
+            paygate_service_1.PayGateService,
+            subscription_payment_service_1.SubscriptionPaymentService,
         ],
     })
 ], AppModule);

@@ -12,4 +12,10 @@ export declare class UserSubscriptionRepository {
     findWithPagination(page?: number, limit?: number): Promise<UserSubscriptionDocument[]>;
     count(): Promise<number>;
     findActiveByUserId(userId: string): Promise<UserSubscriptionDocument | null>;
+    findById(subscriptionId: string): Promise<UserSubscriptionDocument | null>;
+    updateById(subscriptionId: string, updateData: any): Promise<UserSubscriptionDocument | null>;
+    findActiveSubscriptions(): Promise<UserSubscriptionDocument[]>;
+    findActiveByUserIdAndType(userId: string, subscriptionTypeId: string): Promise<UserSubscriptionDocument | null>;
+    findByUserAndTypeInDateRange(userId: string, subscriptionTypeId: string, startDate: Date, endDate: Date): Promise<UserSubscriptionDocument | null>;
+    findAllByUserId(userId: string): Promise<UserSubscriptionDocument[]>;
 }

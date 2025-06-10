@@ -104,6 +104,13 @@ export class CourseController {
     return this.courseService.getCoursesForUserType(userType);
   }
 
+  @Get('user/accessible')
+  @UseGuards(JwtAuthGuard)
+  async getCoursesForUser(@Request() req) {
+    const userId = req.user.userId;
+    return this.courseService.getCoursesForUser(userId);
+  }
+
   @Get(':id')
   async getCourseById(@Param('id') id: string) {
     return this.courseService.getCourseById(id);

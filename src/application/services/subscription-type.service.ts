@@ -52,6 +52,7 @@ export class SubscriptionTypeService {
       description: subscriptionType.description,
       price: subscriptionType.price,
       duration: subscriptionType.duration,
+      level: subscriptionType.level,
       features: subscriptionType.features,
       createdAt: subscriptionType.createdAt,
       updatedAt: subscriptionType.updatedAt,

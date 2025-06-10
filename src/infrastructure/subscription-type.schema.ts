@@ -18,6 +18,9 @@ export class SubscriptionTypeSchema {
   @Prop({ type: [String], default: [] })
   features: string[];
 
+  @Prop({ required: true, default: 1 })
+  level: number; // Niveau hiérarchique pour les upgrades (1 = basique, 2 = standard, 3 = premium, etc.)
+
   @Prop({ default: Date.now })
   createdAt: Date;
 

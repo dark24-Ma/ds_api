@@ -55,6 +55,10 @@ let CourseController = class CourseController {
     async getCoursesByUserType(userType) {
         return this.courseService.getCoursesForUserType(userType);
     }
+    async getCoursesForUser(req) {
+        const userId = req.user.userId;
+        return this.courseService.getCoursesForUser(userId);
+    }
     async getCourseById(id) {
         return this.courseService.getCourseById(id);
     }
@@ -185,6 +189,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CourseController.prototype, "getCoursesByUserType", null);
+__decorate([
+    (0, common_1.Get)('user/accessible'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], CourseController.prototype, "getCoursesForUser", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),

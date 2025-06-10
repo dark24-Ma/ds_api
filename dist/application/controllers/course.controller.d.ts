@@ -78,6 +78,15 @@ export declare class CourseController {
         createdBy: any;
         resources: any;
     }[]>;
+    getCoursesForUser(req: any): Promise<{
+        courses: any[];
+        userSubscription: {
+            subscriptionType: any;
+            subscriptionTypeId: any;
+            isActive: any;
+            endDate: any;
+        };
+    }>;
     getCourseById(id: string): Promise<{
         id: any;
         title: any;

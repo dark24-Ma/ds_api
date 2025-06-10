@@ -18,7 +18,10 @@ export class UserSubscriptionRepository {
   }
 
   async findByUserId(userId: string): Promise<UserSubscriptionDocument | null> {
-    return this.userSubscriptionModel.findOne({ userId }).exec();
+    return this.userSubscriptionModel
+      .findOne({ userId })
+      .sort({ createdAt: -1 }) // Retourner le plus récent
+      .exec();
   }
 
   async update(
@@ -63,6 +66,58 @@ export class UserSubscriptionRepository {
         isActive: true,
         endDate: { $gte: new Date() }
       })
+      .exec();
+  }
+
+  async findById(subscriptionId: string): Promise<UserSubscriptionDocument | null> {
+    return this.userSubscriptionModel.findById(subscriptionId).exec();
+  }
+
+  async updateById(subscriptionId: string, updateData: any): Promise<UserSubscriptionDocument | null> {
+    return this.userSubscriptionModel
+      .findByIdAndUpdate(subscriptionId, updateData, { new: true })
+      .exec();
+  }
+
+  async findActiveSubscriptions(): Promise<UserSubscriptionDocument[]> {
+    return this.userSubscriptionModel
+      .find({ isActive: true })
+      .exec();
+  }
+
+  async findActiveByUserIdAndType(userId: string, subscriptionTypeId: string): Promise<UserSubscriptionDocument | null> {
+    return this.userSubscriptionModel
+      .findOne({ 
+        userId: userId,
+        subscriptionTypeId: subscriptionTypeId,
+        isActive: true,
+        endDate: { $gte: new Date() }
+      })
+      .exec();
+  }
+
+  async findByUserAndTypeInDateRange(
+    userId: string, 
+    subscriptionTypeId: string, 
+    startDate: Date, 
+    endDate: Date
+  ): Promise<UserSubscriptionDocument | null> {
+    return this.userSubscriptionModel
+      .findOne({
+        userId: userId,
+        subscriptionTypeId: subscriptionTypeId,
+        createdAt: {
+          $gte: startDate,
+          $lt: endDate
+        }
+      })
+      .exec();
+  }
+
+  async findAllByUserId(userId: string): Promise<UserSubscriptionDocument[]> {
+    return this.userSubscriptionModel
+      .find({ userId })
+      .sort({ createdAt: -1 }) // Du plus récent au plus ancien
       .exec();
   }
 }

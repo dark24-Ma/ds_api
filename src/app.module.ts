@@ -45,12 +45,19 @@ import { UserSubscriptionRepository } from './infrastructure/repository/user-sub
 import { SubscriptionTypeModel } from './infrastructure/subscription-type.schema';
 import { UserSubscriptionModel } from './infrastructure/user-subscription.schema';
 import { SubscriptionTypeController } from './application/controllers/subscription-type.controller';
+import { PaymentController } from './application/controllers/payment.controller';
+import { PayGateService } from './application/services/paygate.service';
+import { SubscriptionPaymentService } from './application/services/subscription-payment.service';
+import { ConfigModule } from '@nestjs/config';
 // import { SubscriptionTypeModel } from './infrastructure/repository/subscription-type.schema';
 // import { UserSubscriptionModel } from './infrastructure/repository/user-subscription.schema';
 dotenv.config();
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     MongooseModule.forRoot(process.env.MONGODB_URI),
     MongooseModule.forFeature([
       { name: 'User', schema: userModel },
@@ -92,6 +99,7 @@ dotenv.config();
     CourseSenderController,
     SubscriptionTypeController,
     UserSubscriptionController,
+    PaymentController,
   ],
   providers: [
     UserRepository,
@@ -114,6 +122,8 @@ dotenv.config();
     UserSubscriptionService,
     SubscriptionTypeRepository,
     UserSubscriptionRepository,
+    PayGateService,
+    SubscriptionPaymentService,
   ],
 })
 export class AppModule {}

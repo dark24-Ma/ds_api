@@ -25,7 +25,10 @@ let UserSubscriptionRepository = class UserSubscriptionRepository {
         return userSubscription.save();
     }
     async findByUserId(userId) {
-        return this.userSubscriptionModel.findOne({ userId }).exec();
+        return this.userSubscriptionModel
+            .findOne({ userId })
+            .sort({ createdAt: -1 })
+            .exec();
     }
     async update(userId, updateData) {
         return this.userSubscriptionModel
@@ -57,6 +60,47 @@ let UserSubscriptionRepository = class UserSubscriptionRepository {
             isActive: true,
             endDate: { $gte: new Date() }
         })
+            .exec();
+    }
+    async findById(subscriptionId) {
+        return this.userSubscriptionModel.findById(subscriptionId).exec();
+    }
+    async updateById(subscriptionId, updateData) {
+        return this.userSubscriptionModel
+            .findByIdAndUpdate(subscriptionId, updateData, { new: true })
+            .exec();
+    }
+    async findActiveSubscriptions() {
+        return this.userSubscriptionModel
+            .find({ isActive: true })
+            .exec();
+    }
+    async findActiveByUserIdAndType(userId, subscriptionTypeId) {
+        return this.userSubscriptionModel
+            .findOne({
+            userId: userId,
+            subscriptionTypeId: subscriptionTypeId,
+            isActive: true,
+            endDate: { $gte: new Date() }
+        })
+            .exec();
+    }
+    async findByUserAndTypeInDateRange(userId, subscriptionTypeId, startDate, endDate) {
+        return this.userSubscriptionModel
+            .findOne({
+            userId: userId,
+            subscriptionTypeId: subscriptionTypeId,
+            createdAt: {
+                $gte: startDate,
+                $lt: endDate
+            }
+        })
+            .exec();
+    }
+    async findAllByUserId(userId) {
+        return this.userSubscriptionModel
+            .find({ userId })
+            .sort({ createdAt: -1 })
             .exec();
     }
 };

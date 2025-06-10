@@ -145,6 +145,15 @@ export declare class CourseService {
         type: string;
     }>;
     canAccessCourse(userId: string, courseId: string): Promise<boolean>;
+    getCoursesForUser(userId: string): Promise<{
+        courses: any[];
+        userSubscription: {
+            subscriptionType: any;
+            subscriptionTypeId: any;
+            isActive: any;
+            endDate: any;
+        };
+    }>;
     addResourceToCourse(courseId: string, resourceData: any, file?: UploadedFile): Promise<import("../../infrastructure/course.schema").CourseDocument>;
     removeResourceFromCourse(courseId: string, resourceId: string): Promise<import("../../infrastructure/course.schema").CourseDocument>;
     updateResourcesOrder(courseId: string, resourcesOrder: {

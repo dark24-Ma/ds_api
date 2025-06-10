@@ -35,6 +35,10 @@ __decorate([
     __metadata("design:type", Array)
 ], SubscriptionTypeSchema.prototype, "features", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({ required: true, default: 1 }),
+    __metadata("design:type", Number)
+], SubscriptionTypeSchema.prototype, "level", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ default: Date.now }),
     __metadata("design:type", Date)
 ], SubscriptionTypeSchema.prototype, "createdAt", void 0);

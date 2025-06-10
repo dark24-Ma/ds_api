@@ -251,6 +251,55 @@ let CourseService = class CourseService {
         }
         return false;
     }
+    async getCoursesForUser(userId) {
+        const allCourses = await this.courseRepository.findAll();
+        let userSubscription = null;
+        try {
+            userSubscription = await this.userSubscriptionService.getUserSubscription(userId);
+        }
+        catch (error) {
+        }
+        const accessibleCourses = [];
+        for (const course of allCourses) {
+            if (course.isFreeAccess) {
+                accessibleCourses.push({
+                    ...this.formatCourseResponse(course),
+                    accessType: 'free',
+                    hasAccess: true
+                });
+                continue;
+            }
+            if (course.requiredSubscriptionTypes.length === 0) {
+                accessibleCourses.push({
+                    ...this.formatCourseResponse(course),
+                    accessType: 'unrestricted',
+                    hasAccess: true
+                });
+                continue;
+            }
+            let hasAccess = false;
+            if (userSubscription &&
+                userSubscription.isActive &&
+                new Date() <= userSubscription.endDate) {
+                hasAccess = course.requiredSubscriptionTypes.includes(userSubscription.subscriptionTypeId);
+            }
+            accessibleCourses.push({
+                ...this.formatCourseResponse(course),
+                accessType: 'premium',
+                hasAccess,
+                requiredSubscriptionTypes: course.requiredSubscriptionTypes
+            });
+        }
+        return {
+            courses: accessibleCourses,
+            userSubscription: userSubscription ? {
+                subscriptionType: userSubscription.subscriptionType?.name,
+                subscriptionTypeId: userSubscription.subscriptionTypeId,
+                isActive: userSubscription.isActive,
+                endDate: userSubscription.endDate
+            } : null
+        };
+    }
     async addResourceToCourse(courseId, resourceData, file) {
         const course = await this.courseRepository.findById(courseId);
         if (!course) {
