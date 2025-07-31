@@ -49,6 +49,12 @@ import { PaymentController } from './application/controllers/payment.controller'
 import { PayGateService } from './application/services/paygate.service';
 import { SubscriptionPaymentService } from './application/services/subscription-payment.service';
 import { ConfigModule } from '@nestjs/config';
+import { BannerModel } from './infrastructure/banner.schema';
+import { BannerController } from './application/controllers/banner.controller';
+import { BannerService } from './application/services/banner.service';
+import { BannerRepository } from './infrastructure/repository/banner.repository';
+import { DashboardStatisticsController } from './application/controllers/dashboard-statistics.controller';
+import { DashboardStatisticsService } from './application/services/dashboard-statistics.service';
 // import { SubscriptionTypeModel } from './infrastructure/repository/subscription-type.schema';
 // import { UserSubscriptionModel } from './infrastructure/repository/user-subscription.schema';
 dotenv.config();
@@ -66,6 +72,7 @@ dotenv.config();
       { name: 'Course', schema: CourseModel },
       { name: 'SubscriptionType', schema: SubscriptionTypeModel },
       { name: 'UserSubscription', schema: UserSubscriptionModel },
+      { name: 'Banner', schema: BannerModel },
     ]),
     MulterModule.register({
       storage: diskStorage({
@@ -100,6 +107,8 @@ dotenv.config();
     SubscriptionTypeController,
     UserSubscriptionController,
     PaymentController,
+    BannerController,
+    DashboardStatisticsController,
   ],
   providers: [
     UserRepository,
@@ -124,6 +133,9 @@ dotenv.config();
     UserSubscriptionRepository,
     PayGateService,
     SubscriptionPaymentService,
+    BannerService,
+    BannerRepository,
+    DashboardStatisticsService,
   ],
 })
 export class AppModule {}

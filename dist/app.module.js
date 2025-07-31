@@ -53,6 +53,12 @@ const payment_controller_1 = require("./application/controllers/payment.controll
 const paygate_service_1 = require("./application/services/paygate.service");
 const subscription_payment_service_1 = require("./application/services/subscription-payment.service");
 const config_1 = require("@nestjs/config");
+const banner_schema_1 = require("./infrastructure/banner.schema");
+const banner_controller_1 = require("./application/controllers/banner.controller");
+const banner_service_1 = require("./application/services/banner.service");
+const banner_repository_1 = require("./infrastructure/repository/banner.repository");
+const dashboard_statistics_controller_1 = require("./application/controllers/dashboard-statistics.controller");
+const dashboard_statistics_service_1 = require("./application/services/dashboard-statistics.service");
 dotenv.config();
 let AppModule = class AppModule {
 };
@@ -71,6 +77,7 @@ exports.AppModule = AppModule = __decorate([
                 { name: 'Course', schema: course_schema_1.CourseModel },
                 { name: 'SubscriptionType', schema: subscription_type_schema_1.SubscriptionTypeModel },
                 { name: 'UserSubscription', schema: user_subscription_schema_1.UserSubscriptionModel },
+                { name: 'Banner', schema: banner_schema_1.BannerModel },
             ]),
             platform_express_1.MulterModule.register({
                 storage: (0, multer_1.diskStorage)({
@@ -103,6 +110,8 @@ exports.AppModule = AppModule = __decorate([
             subscription_type_controller_1.SubscriptionTypeController,
             user_subscription_controller_1.UserSubscriptionController,
             payment_controller_1.PaymentController,
+            banner_controller_1.BannerController,
+            dashboard_statistics_controller_1.DashboardStatisticsController,
         ],
         providers: [
             user_repository_1.UserRepository,
@@ -127,6 +136,9 @@ exports.AppModule = AppModule = __decorate([
             user_subscription_repository_1.UserSubscriptionRepository,
             paygate_service_1.PayGateService,
             subscription_payment_service_1.SubscriptionPaymentService,
+            banner_service_1.BannerService,
+            banner_repository_1.BannerRepository,
+            dashboard_statistics_service_1.DashboardStatisticsService,
         ],
     })
 ], AppModule);
