@@ -15,7 +15,7 @@ async function bootstrap() {
     }
     app.use('/uploads', express.static(uploadPath));
     app.enableCors();
-    await app.listen(2403);
+    await app.listen(8086);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

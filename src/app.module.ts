@@ -59,12 +59,16 @@ import { DashboardStatisticsService } from './application/services/dashboard-sta
 // import { UserSubscriptionModel } from './infrastructure/repository/user-subscription.schema';
 dotenv.config();
 
+const uri = process.env.MONGODB_URI;
+if (!uri) {
+  throw new Error('MONGODB_URI is not defined in the environment variables');
+}
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.MONGODB_URI),
+    MongooseModule.forRoot(uri),
     MongooseModule.forFeature([
       { name: 'User', schema: userModel },
       { name: 'Newsletter', schema: NewsletterModel },

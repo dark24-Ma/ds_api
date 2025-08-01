@@ -60,6 +60,10 @@ const banner_repository_1 = require("./infrastructure/repository/banner.reposito
 const dashboard_statistics_controller_1 = require("./application/controllers/dashboard-statistics.controller");
 const dashboard_statistics_service_1 = require("./application/services/dashboard-statistics.service");
 dotenv.config();
+const uri = process.env.MONGODB_URI;
+if (!uri) {
+    throw new Error('MONGODB_URI is not defined in the environment variables');
+}
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -69,7 +73,7 @@ exports.AppModule = AppModule = __decorate([
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
             }),
-            mongoose_1.MongooseModule.forRoot(process.env.MONGODB_URI),
+            mongoose_1.MongooseModule.forRoot(uri),
             mongoose_1.MongooseModule.forFeature([
                 { name: 'User', schema: user_schema_1.userModel },
                 { name: 'Newsletter', schema: newsletter_schema_1.NewsletterModel },

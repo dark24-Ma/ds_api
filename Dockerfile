@@ -17,6 +17,5 @@ RUN npm install --only=production
 
 COPY --from=builder /app/dist ./dist
 
-EXPOSE 8085
-
+EXPOSE 8086
 CMD ["node", "dist/main"]
